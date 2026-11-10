@@ -883,18 +883,19 @@ body {
   background: transparent;
   border: none;
   color: #131313;
-  opacity: 0.6;
+  opacity: 0.35;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .receipt-remove-btn:hover {
-  opacity: 1;
-  transform: scale(1.15);
+  opacity: 0.75;
 }
 
 .receipt-remove-btn svg {
   display: block;
+  width: 12px;
+  height: 12px;
 }
 
 /* instagram - @hotcatpic */
