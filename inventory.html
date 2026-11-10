@@ -657,12 +657,38 @@
       });
     }
 
+    // Usable areas on the 374x450 case: main back (x 90..276, y 130..412) and the
+    // narrow strip beside the camera bump (x 190..277, y 30..412). Stickers that are
+    // dragged into the strip shrink to fit and grow back when dragged out.
+    const CASE_AREA = { minX: 90, maxX: 276, minY: 130, maxY: 412 };
+    const STRIP_AREA = { minX: 190, maxX: 277, minY: 30, maxY: 410 };
+
     function makeStickerDraggable(el, stickerObj) {
       let isDragging = false;
       let startX = 0;
       let startY = 0;
-      let origLeft = 0;
-      let origTop = 0;
+      let startCx = 0;
+      let startCy = 0;
+
+      if (!stickerObj.base) {
+        const rot = Math.abs(stickerObj.rotate) === 90;
+        stickerObj.base = {
+          width: stickerObj.width,
+          height: stickerObj.height,
+          padL: rot ? 0 : (stickerObj.padL || 0),
+          padR: rot ? 0 : (stickerObj.padR || 0),
+          padT: rot ? 0 : (stickerObj.padT || 0),
+          padB: rot ? 0 : (stickerObj.padB || 0),
+          rot
+        };
+        stickerObj.scale = 1;
+      }
+      const B = stickerObj.base;
+      // visible-box centre offset inside the element, and visible size, in base units
+      const ox = B.padL + (B.width - B.padL - B.padR) / 2;
+      const oy = B.padT + (B.height - B.padT - B.padB) / 2;
+      const visW = B.rot ? B.height : (B.width - B.padL - B.padR);
+      const visH = B.rot ? B.width : (B.height - B.padT - B.padB);
 
       el.addEventListener('pointerdown', (e) => {
         e.preventDefault();
@@ -670,8 +696,9 @@
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
-        origLeft = stickerObj.left;
-        origTop = stickerObj.top;
+        const sc = stickerObj.scale || 1;
+        startCx = stickerObj.left + ox * sc;
+        startCy = stickerObj.top + oy * sc;
         topZCounter += 1;
         stickerObj.zIndex = topZCounter;
         el.style.zIndex = String(topZCounter);
@@ -680,28 +707,36 @@
 
       el.addEventListener('pointermove', (e) => {
         if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        const cx = startCx + (e.clientX - startX);
+        const cy = startCy + (e.clientY - startY);
 
-        const isRotated90 = Math.abs(stickerObj.rotate) === 90;
-        const effW = isRotated90 ? stickerObj.height : stickerObj.width;
-        const effH = isRotated90 ? stickerObj.width : stickerObj.height;
-        const offsetX = (effW - stickerObj.width) / 2;
-        const offsetY = (effH - stickerObj.height) / 2;
+        // Decide whether the sticker is being pushed up beside the camera
+        const wantsStrip = cx >= 185 && (cy - visH / 2) < 126;
+        let sc = 1;
+        let area = CASE_AREA;
+        if (wantsStrip) {
+          area = STRIP_AREA;
+          const stripW = STRIP_AREA.maxX - STRIP_AREA.minX;
+          sc = Math.min(1, stripW / visW);
+        }
 
-        const padL = isRotated90 ? 0 : (stickerObj.padL || 0);
-        const padR = isRotated90 ? 0 : (stickerObj.padR || 0);
-        const padT = isRotated90 ? 0 : (stickerObj.padT || 0);
-        const padB = isRotated90 ? 0 : (stickerObj.padB || 0);
+        const w = visW * sc;
+        const h = visH * sc;
+        const clampedCx = Math.max(area.minX + w / 2, Math.min(area.maxX - w / 2, cx));
+        const clampedCy = Math.max(area.minY + h / 2, Math.min(area.maxY - h / 2, cy));
 
-        const minX = 90 + offsetX - padL;
-        const maxX = 276 - effW + offsetX + padR;
-        const minY = 130 + offsetY - padT;
-        const maxY = 412 - effH + offsetY + padB;
+        stickerObj.scale = sc;
+        stickerObj.width = B.width * sc;
+        stickerObj.height = B.height * sc;
+        stickerObj.padL = B.padL * sc;
+        stickerObj.padR = B.padR * sc;
+        stickerObj.padT = B.padT * sc;
+        stickerObj.padB = B.padB * sc;
+        stickerObj.left = Math.round((clampedCx - ox * sc) * 10) / 10;
+        stickerObj.top = Math.round((clampedCy - oy * sc) * 10) / 10;
 
-        stickerObj.left = Math.max(minX, Math.min(maxX, Math.round(origLeft + dx)));
-        stickerObj.top = Math.max(minY, Math.min(maxY, Math.round(origTop + dy)));
-
+        el.style.width = `${stickerObj.width}px`;
+        el.style.height = `${stickerObj.height}px`;
         el.style.left = `${stickerObj.left}px`;
         el.style.top = `${stickerObj.top}px`;
       });
