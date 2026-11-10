@@ -633,6 +633,14 @@
 
     renderSharedPresets();
     syncSharedPresetsFromServer();
+
+    // Real-time live subscription so presets shared or wishlisted by friends appear immediately
+    try {
+      const es = new EventSource('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82/sse');
+      es.onmessage = () => {
+        syncSharedPresetsFromServer();
+      };
+    } catch (e) {}
   </script>
 </body>
 </html>

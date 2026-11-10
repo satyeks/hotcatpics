@@ -1012,6 +1012,7 @@
       // Sync to shared cloud preset stream so everyone opening the link sees it
       fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {
         method: 'POST',
+        keepalive: true,
         body: JSON.stringify({ action: 'share', preset: presetItem })
       }).catch(() => {});
 
