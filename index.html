@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
   <style>
     /* Clip stickers to the rounded case body so edges never spill past the corners */
     .case-sticker-surface,
@@ -63,7 +63,7 @@
       </nav>
 
       <div class="header-right">
-        <a href="#" class="nav-item nav-wishlist">WISHLIST</a>
+        <a href="#" class="nav-item nav-wishlist" id="navWishlist">WISHLIST 0</a>
         <a href="#" class="nav-item nav-cart" id="navCart">CART 0</a>
       </div>
     </header>
@@ -89,6 +89,7 @@
     <button type="button" class="mobile-back-btn" id="mobileBackBtn">‹ BACK TO PRESETS</button>
     <aside class="preset-detail-panel" id="presetDetailPanel">
       <div class="detail-preview-box" id="detailPreviewBox">
+        <button type="button" class="preset-like-btn detail-like-btn" id="detailLikeBtn" aria-label="Add to wishlist"></button>
         <div class="detail-case-stage" id="detailCaseStage">
           <img src="assets/case-white.png" alt="Preset Case" class="detail-case-img" id="detailCaseImg" />
           <div class="detail-sticker-surface" id="detailStickerSurface"></div>
@@ -129,9 +130,11 @@
 
     const landingPage = document.getElementById('landingPage');
     const presetsNavLink = document.getElementById('presetsNavLink');
+    const navWishlist = document.getElementById('navWishlist');
     const navCart = document.getElementById('navCart');
     const clearPresetsBtn = document.getElementById('clearPresetsBtn');
     const detailPreviewBox = document.getElementById('detailPreviewBox');
+    const detailLikeBtn = document.getElementById('detailLikeBtn');
     const detailCaseImg = document.getElementById('detailCaseImg');
     const detailStickerSurface = document.getElementById('detailStickerSurface');
     const detailCharmLayer = document.getElementById('detailCharmLayer');
@@ -168,6 +171,10 @@
         if (lsCart !== null && store.cartCount === undefined) {
           store.cartCount = parseInt(lsCart, 10) || 0;
         }
+        const lsWish = localStorage.getItem('hotcatpics_wishlist');
+        if (lsWish) {
+          store.wishlist = JSON.parse(lsWish);
+        }
       } catch (e) {}
       return store;
     }
@@ -184,14 +191,70 @@
         if (store.cartCount !== undefined) {
           localStorage.setItem('hotcatpics_cart_count', String(store.cartCount));
         }
+        if (store.wishlist !== undefined) {
+          localStorage.setItem('hotcatpics_wishlist', JSON.stringify(store.wishlist));
+        }
         if (store.currentOrder !== undefined) {
           localStorage.setItem('hotcatpics_current_order', JSON.stringify(store.currentOrder));
         }
       } catch (e) {}
     }
 
+    const HEART_SVG = '<svg width="16" height="15" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2C12 20.2 2.5 14 2.5 7.2C2.5 3.9 5.1 1.5 8.2 1.5C10.1 1.5 11.4 2.5 12 3.8C12.6 2.5 13.9 1.5 15.8 1.5C18.9 1.5 21.5 3.9 21.5 7.2C21.5 14 12 20.2 12 20.2Z"/></svg>';
+
     let cartCount = loadStore().cartCount || 0;
     navCart.textContent = `CART ${cartCount}`;
+
+    let wishlistOnlyMode = location.hash === '#wishlist';
+
+    function getPresetKey(preset, fallbackIdx) {
+      if (preset && preset.id) return String(preset.id);
+      return `preset_idx_${fallbackIdx || 0}`;
+    }
+
+    function getWishlistSet() {
+      const list = loadStore().wishlist;
+      return new Set(Array.isArray(list) ? list : []);
+    }
+
+    function syncWishlistHeader() {
+      const presets = Array.isArray(loadStore().presets) ? loadStore().presets : [];
+      const validKeys = new Set(presets.map((p, i) => getPresetKey(p, i)));
+      const wishSet = getWishlistSet();
+      // Keep only wishlist entries that correspond to existing presets (if presets are loaded)
+      let count = 0;
+      if (presets.length > 0) {
+        wishSet.forEach((k) => { if (validKeys.has(k)) count += 1; });
+      } else {
+        count = wishSet.size;
+      }
+      navWishlist.textContent = `WISHLIST ${count}`;
+      navWishlist.classList.toggle('active', wishlistOnlyMode);
+      presetsNavLink.classList.toggle('active', !wishlistOnlyMode);
+    }
+
+    function toggleWishlistForPreset(preset, fallbackIdx) {
+      const key = getPresetKey(preset, fallbackIdx);
+      const wishSet = getWishlistSet();
+      if (wishSet.has(key)) {
+        wishSet.delete(key);
+      } else {
+        wishSet.add(key);
+      }
+      saveStore({ wishlist: Array.from(wishSet) });
+      syncWishlistHeader();
+      if (activePresetData && getPresetKey(activePresetData, activePresetIndex) === key) {
+        detailLikeBtn.classList.toggle('is-liked', wishSet.has(key));
+      }
+      renderSharedPresets();
+    }
+
+    detailLikeBtn.innerHTML = HEART_SVG;
+    detailLikeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!activePresetData) return;
+      toggleWishlistForPreset(activePresetData, activePresetIndex);
+    });
 
     const BLOCK_COLORS = ['#8783FF', '#F8D548', '#61C7E7', '#7B0000', '#C8C8C8', '#FF9393', '#2AB8E6', '#FDE7AC'];
 
@@ -294,6 +357,9 @@
       const accumulatedPrice = calculatePresetPrice(preset);
       detailPriceValue.textContent = `₹${accumulatedPrice.toFixed(2)}`;
 
+      const isLiked = getWishlistSet().has(getPresetKey(preset, idx));
+      detailLikeBtn.classList.toggle('is-liked', isLiked);
+
       landingPage.classList.add('split-view');
       if (window.innerWidth <= 820) window.scrollTo(0, 0);
       updateCanvasHeight();
@@ -307,21 +373,34 @@
       updateCanvasHeight();
     }
 
-    // Clicking PRESETS nav link returns to full 4-column grid if in split view
+    // Clicking PRESETS nav link returns to full 4-column grid and exits wishlist filter
     presetsNavLink.addEventListener('click', (e) => {
-      if (landingPage.classList.contains('split-view')) {
+      if (landingPage.classList.contains('split-view') || wishlistOnlyMode) {
         e.preventDefault();
+        wishlistOnlyMode = false;
+        if (location.hash === '#wishlist') history.replaceState(null, '', 'index.html');
         closePresetDetail();
+        syncWishlistHeader();
+        renderSharedPresets();
       }
+    });
+
+    // Clicking WISHLIST in top-right filters the grid to wishlisted presets (or back to all)
+    navWishlist.addEventListener('click', (e) => {
+      e.preventDefault();
+      wishlistOnlyMode = !wishlistOnlyMode;
+      closePresetDetail();
+      syncWishlistHeader();
+      renderSharedPresets();
     });
 
     document.getElementById('mobileBackBtn').addEventListener('click', closePresetDetail);
 
     if (clearPresetsBtn) {
       clearPresetsBtn.addEventListener('click', () => {
-        saveStore({ presets: [] });
-        if (location.protocol.startsWith('http')) {
-          fetch('/api/presets', { method: 'DELETE' }).catch(() => {});
+        if (wishlistOnlyMode) {
+          wishlistOnlyMode = false;
+          syncWishlistHeader();
         }
         closePresetDetail();
         renderSharedPresets();
@@ -386,11 +465,14 @@
       const presets = Array.isArray(currentStore.presets) ? currentStore.presets : [];
       grid.innerHTML = '';
 
+      const wishSet = getWishlistSet();
+
       // Most ordered first; ties -> newest first
       const sorted = presets
         .map((p, i) => ({ p, i }))
         .sort((a, b) => ((b.p.orders || 0) - (a.p.orders || 0)) || (b.i - a.i))
-        .map((x) => x.p);
+        .map((x) => x.p)
+        .filter((p, i) => !wishlistOnlyMode || wishSet.has(getPresetKey(p, i)));
 
       sorted.forEach((preset, idx) => {
         const block = document.createElement('div');
@@ -455,25 +537,18 @@
 
         block.appendChild(presetStage);
 
-        // Remove individual preset button on hover
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'preset-remove-btn';
-        removeBtn.title = 'Remove preset';
-        removeBtn.textContent = '×';
-        removeBtn.addEventListener('click', (e) => {
+        // Minimalistic heart button to like / add preset to wishlist
+        const likeBtn = document.createElement('button');
+        likeBtn.type = 'button';
+        const isLiked = wishSet.has(getPresetKey(preset, idx));
+        likeBtn.className = 'preset-like-btn' + (isLiked ? ' is-liked' : '');
+        likeBtn.setAttribute('aria-label', 'Add to wishlist');
+        likeBtn.innerHTML = HEART_SVG;
+        likeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const updated = presets.filter((p) => p !== preset && !(p.id && p.id === preset.id));
-          saveStore({ presets: updated });
-          if (preset.id && location.protocol.startsWith('http')) {
-            fetch(`/api/presets/${encodeURIComponent(preset.id)}`, { method: 'DELETE' }).catch(() => {});
-          }
-          if (activePresetIndex === idx) {
-            closePresetDetail();
-          }
-          renderSharedPresets();
+          toggleWishlistForPreset(preset, idx);
         });
-        block.appendChild(removeBtn);
+        block.appendChild(likeBtn);
 
         // Clicking a populated preset block opens it in the split-view detail panel
         block.onclick = () => {
@@ -484,6 +559,7 @@
           }
         };
       });
+      syncWishlistHeader();
       updateCanvasHeight();
     }
 

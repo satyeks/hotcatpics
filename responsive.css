@@ -128,7 +128,6 @@
   .block {
     zoom: var(--block-zoom, 0.5);
   }
-  .preset-remove-btn { opacity: 1; }
 
   .landing-page.split-view .filter-bar,
   .landing-page.split-view .grid-container {

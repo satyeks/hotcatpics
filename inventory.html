@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="inventory.css?v=13" />
+  <link rel="stylesheet" href="inventory.css?v=14" />
   <style>
     /* Clip stickers to the rounded case body so edges never spill past the corners */
     .case-sticker-surface,
@@ -138,7 +138,7 @@
       </nav>
 
       <div class="header-right">
-        <a href="#" class="nav-item nav-wishlist">WISHLIST</a>
+        <a href="index.html#wishlist" class="nav-item nav-wishlist" id="navWishlist">WISHLIST 0</a>
         <a href="#" class="nav-item nav-cart" id="navCart">CART 0</a>
       </div>
     </header>
@@ -581,6 +581,10 @@
         if (lsCart !== null && store.cartCount === undefined) {
           store.cartCount = parseInt(lsCart, 10) || 0;
         }
+        const lsWish = localStorage.getItem('hotcatpics_wishlist');
+        if (lsWish) {
+          store.wishlist = JSON.parse(lsWish);
+        }
       } catch (e) {}
       return store;
     }
@@ -596,6 +600,9 @@
         }
         if (store.cartCount !== undefined) {
           localStorage.setItem('hotcatpics_cart_count', String(store.cartCount));
+        }
+        if (store.wishlist !== undefined) {
+          localStorage.setItem('hotcatpics_wishlist', JSON.stringify(store.wishlist));
         }
         if (store.currentOrder !== undefined) {
           localStorage.setItem('hotcatpics_current_order', JSON.stringify(store.currentOrder));
@@ -614,6 +621,9 @@
     const initialStore = loadStore();
     let cartCount = initialStore.cartCount || 0;
     navCart.textContent = `CART ${cartCount}`;
+    const navWishlist = document.getElementById('navWishlist');
+    const wishCount = Array.isArray(initialStore.wishlist) ? initialStore.wishlist.length : 0;
+    if (navWishlist) navWishlist.textContent = `WISHLIST ${wishCount}`;
 
     function ensureCaseVisible() {
       if (!selectedModel) {

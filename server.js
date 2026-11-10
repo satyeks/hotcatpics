@@ -188,3 +188,4 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`HOTCATPICS server running on http://localhost:${PORT}`);
 });
+
