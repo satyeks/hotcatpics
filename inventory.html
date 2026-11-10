@@ -973,18 +973,29 @@
       if (sharePresetBtn.classList.contains('is-shared')) return;
 
       const presetItem = {
-        id: 'preset_' + Date.now(),
+        id: 'preset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
         model: selectedModel || 'IPHONE 16',
         caseColor: selectedCaseColor,
         bgColor: selectedBgColor,
         stickers: Array.from(selectedStickers.values()),
-        charm: selectedCharmId ? CHARM_DATA[selectedCharmId] : null
+        charm: selectedCharmId ? CHARM_DATA[selectedCharmId] : null,
+        orders: 0,
+        createdAt: Date.now()
       };
 
       const store = loadStore();
       const existing = Array.isArray(store.presets) ? store.presets : [];
       existing.push(presetItem);
       saveStore({ presets: existing });
+
+      // Sync to shared backend API when running over HTTP/HTTPS
+      if (location.protocol.startsWith('http')) {
+        fetch('/api/presets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(presetItem)
+        }).catch(() => {});
+      }
 
       // Permanent UI transition
       sharePresetBtn.classList.add('is-shared');

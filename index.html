@@ -204,6 +204,17 @@
         hit.orders = (hit.orders || 0) + 1;
         saveStore({ presets: list });
       }
+      if (preset && preset.id && location.protocol.startsWith('http')) {
+        fetch(`/api/presets/${encodeURIComponent(preset.id)}/order`, { method: 'POST' })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && Array.isArray(data.presets)) {
+              saveStore({ presets: data.presets });
+              renderSharedPresets();
+            }
+          })
+          .catch(() => {});
+      }
     }
 
     let activePresetIndex = null;
@@ -309,6 +320,9 @@
     if (clearPresetsBtn) {
       clearPresetsBtn.addEventListener('click', () => {
         saveStore({ presets: [] });
+        if (location.protocol.startsWith('http')) {
+          fetch('/api/presets', { method: 'DELETE' }).catch(() => {});
+        }
         closePresetDetail();
         renderSharedPresets();
       });
@@ -339,6 +353,7 @@
       const coverCode = CASE_COLOR_CODES[activePresetData.caseColor] || 'P_Cover2';
 
       const currentOrder = {
+        presetId: activePresetData.id || null,
         model: activePresetData.model || 'IPHONE 16',
         caseColor: activePresetData.caseColor || 'white',
         bgColor: activePresetData.bgColor || '#5DC6E8',
@@ -450,6 +465,9 @@
           e.stopPropagation();
           const updated = presets.filter((p) => p !== preset && !(p.id && p.id === preset.id));
           saveStore({ presets: updated });
+          if (preset.id && location.protocol.startsWith('http')) {
+            fetch(`/api/presets/${encodeURIComponent(preset.id)}`, { method: 'DELETE' }).catch(() => {});
+          }
           if (activePresetIndex === idx) {
             closePresetDetail();
           }
@@ -469,7 +487,36 @@
       updateCanvasHeight();
     }
 
+    async function syncSharedPresetsFromServer() {
+      if (!location.protocol.startsWith('http')) return;
+      try {
+        const res = await fetch('/api/presets');
+        const data = await res.json();
+        const serverPresets = Array.isArray(data.presets) ? data.presets : [];
+        const localPresets = Array.isArray(loadStore().presets) ? loadStore().presets : [];
+
+        // Push any locally-created presets that aren't on the server yet
+        const serverIds = new Set(serverPresets.map((p) => p.id));
+        for (const lp of localPresets) {
+          if (lp && lp.id && !serverIds.has(lp.id)) {
+            await fetch('/api/presets', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(lp)
+            });
+          }
+        }
+
+        const refreshed = await fetch('/api/presets').then((r) => r.json());
+        if (refreshed && Array.isArray(refreshed.presets)) {
+          saveStore({ presets: refreshed.presets });
+          renderSharedPresets();
+        }
+      } catch (e) {}
+    }
+
     renderSharedPresets();
+    syncSharedPresetsFromServer();
   </script>
 </body>
 </html>

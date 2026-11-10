@@ -584,6 +584,14 @@
         localStorage.setItem('hotcatpics_orders', JSON.stringify(prev));
       } catch (err) {}
 
+      if (location.protocol.startsWith('http')) {
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        }).catch(() => {});
+      }
+
       submitOrderBtn.textContent = `ORDER SUBMITTED ✓  TOTAL ₹${record.total.toFixed(2)}`;
       submitOrderBtn.classList.add('submitted');
       setTimeout(() => {
