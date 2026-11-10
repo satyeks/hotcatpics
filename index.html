@@ -236,17 +236,44 @@
     function toggleWishlistForPreset(preset, fallbackIdx) {
       const key = getPresetKey(preset, fallbackIdx);
       const wishSet = getWishlistSet();
+      let delta = 1;
       if (wishSet.has(key)) {
         wishSet.delete(key);
+        delta = -1;
       } else {
         wishSet.add(key);
+        delta = 1;
       }
-      saveStore({ wishlist: Array.from(wishSet) });
+
+      const store = loadStore();
+      const list = Array.isArray(store.presets) ? store.presets : [];
+      const hit = list.find((p, i) => getPresetKey(p, i) === key);
+      if (hit) {
+        hit.wishlists = Math.max(0, (Number(hit.wishlists) || 0) + delta);
+      }
+
+      saveStore({ wishlist: Array.from(wishSet), presets: list });
       syncWishlistHeader();
       if (activePresetData && getPresetKey(activePresetData, activePresetIndex) === key) {
         detailLikeBtn.classList.toggle('is-liked', wishSet.has(key));
       }
       renderSharedPresets();
+
+      if (preset && preset.id && location.protocol.startsWith('http')) {
+        fetch(`/api/presets/${encodeURIComponent(preset.id)}/wishlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ delta })
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && Array.isArray(data.presets)) {
+              saveStore({ presets: data.presets });
+              renderSharedPresets();
+            }
+          })
+          .catch(() => {});
+      }
     }
 
     detailLikeBtn.innerHTML = HEART_SVG;
@@ -467,10 +494,14 @@
 
       const wishSet = getWishlistSet();
 
-      // Most ordered first; ties -> newest first
+      // Sort presets from most wishlisted to least wishlisted (ties -> most ordered -> newest first)
       const sorted = presets
-        .map((p, i) => ({ p, i }))
-        .sort((a, b) => ((b.p.orders || 0) - (a.p.orders || 0)) || (b.i - a.i))
+        .map((p, i) => ({
+          p,
+          i,
+          w: Math.max(Number(p.wishlists) || 0, wishSet.has(getPresetKey(p, i)) ? 1 : 0)
+        }))
+        .sort((a, b) => (b.w - a.w) || ((b.p.orders || 0) - (a.p.orders || 0)) || (b.i - a.i))
         .map((x) => x.p)
         .filter((p, i) => !wishlistOnlyMode || wishSet.has(getPresetKey(p, i)));
 

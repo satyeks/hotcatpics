@@ -73,7 +73,12 @@ function parseBody(req) {
 function sortPresetsDescending(presets) {
   return presets
     .map((p, idx) => ({ p, idx }))
-    .sort((a, b) => ((b.p.orders || 0) - (a.p.orders || 0)) || ((b.p.createdAt || b.idx) - (a.p.createdAt || a.idx)))
+    .sort(
+      (a, b) =>
+        ((Number(b.p.wishlists) || 0) - (Number(a.p.wishlists) || 0)) ||
+        ((Number(b.p.orders) || 0) - (Number(a.p.orders) || 0)) ||
+        ((b.p.createdAt || b.idx) - (a.p.createdAt || a.idx))
+    )
     .map((x) => x.p);
 }
 
@@ -114,6 +119,20 @@ const server = http.createServer(async (req, res) => {
     db.presets = [];
     saveDB(db);
     return sendJSON(res, 200, { presets: [] });
+  }
+
+  const wishMatch = pathname.match(/^\/api\/presets\/([^/]+)\/wishlist$/);
+  if (wishMatch && req.method === 'POST') {
+    const presetId = wishMatch[1];
+    const body = await parseBody(req);
+    const delta = Number(body.delta) === -1 ? -1 : 1;
+    const db = loadDB();
+    const target = db.presets.find((p) => p.id === presetId);
+    if (target) {
+      target.wishlists = Math.max(0, (Number(target.wishlists) || 0) + delta);
+      saveDB(db);
+    }
+    return sendJSON(res, 200, { presets: sortPresetsDescending(db.presets) });
   }
 
   const orderMatch = pathname.match(/^\/api\/presets\/([^/]+)\/order$/);
