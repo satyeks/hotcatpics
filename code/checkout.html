@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOTCATPICS - CHECKOUT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="checkout.css?v=10" />
+  <style>
+    /* Clip stickers to the rounded case body so edges never spill past the corners */
+    .case-sticker-surface,
+    .preset-sticker-surface,
+    .detail-sticker-surface,
+    .summary-sticker-surface {
+      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
+      clip-path: inset(29px 96px 29px 88px round 38px) !important;
+    }
+    *, html, body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    html, body {
+      overflow-x: hidden !important;
+    }
+    .summary-sticker-surface,
+    .summary-charm-layer {
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .summary-sticker-surface { z-index: 20 !important; }
+    .summary-charm-layer { z-index: 30 !important; }
+  </style>
+  <link rel="stylesheet" href="responsive.css?v=1" />
+  <script src="responsive.js"></script>
+</head>
+<body>
+  <div class="checkout-page">
+    <!-- Header Logo -->
+    <header class="header">
+      <a href="index.html" class="logo">HOTCATPICS</a>
+    </header>
+
+    <!-- Left Column: Checkout Form -->
+    <section class="checkout-left">
+      <a href="inventory.html" class="back-btn" aria-label="Back to Inventory">
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.5 1.5L2 8L8.5 14.5" stroke="#000000" stroke-width="1.6" stroke-linecap="square"/>
+        </svg>
+      </a>
+
+      <form id="checkoutForm" class="checkout-form" novalidate>
+        <!-- CONTACT INFORMATION -->
+        <h2 class="section-heading">CONTACT INFORMATION</h2>
+
+        <div class="form-group">
+          <label for="emailInput" class="field-label">EMAIL ADDRESS</label>
+          <input type="email" id="emailInput" class="field-input" required />
+        </div>
+
+        <label class="subscribe-row">
+          <input type="checkbox" id="subscribeCheck" checked />
+          <span class="custom-round-check">
+            <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+              <path d="M1 3.5L3.2 5.7L8 1" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="subscribe-text">SUBSCRIBE TO UPDATES AND NOTIFICATIONS</span>
+        </label>
+
+        <!-- BILLING ADDRESS -->
+        <h2 class="section-heading heading-billing">BILLING ADDRESS</h2>
+
+        <div class="form-group">
+          <label for="addressInput" class="field-label">ADDRESS</label>
+          <input type="text" id="addressInput" class="field-input" placeholder="START TYPING YOUR ADDRESS..." required />
+        </div>
+
+        <div class="form-group">
+          <label for="aptInput" class="field-label">APARTMENT, SUITE, UNIT, ETC. (OPTIONAL)</label>
+          <input type="text" id="aptInput" class="field-input" placeholder="APARTMENT, SUITE, UNIT, FLOOR, ETC." />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="cityInput" class="field-label">CITY</label>
+            <input type="text" id="cityInput" class="field-input" required />
+          </div>
+          <div class="form-group">
+            <label for="stateInput" class="field-label">STATE / PROVINCE</label>
+            <input type="text" id="stateInput" class="field-input" required />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="zipInput" class="field-label">ZIP / POSTAL CODE</label>
+            <input type="text" id="zipInput" class="field-input" required />
+          </div>
+          <div class="form-group">
+            <label for="countryInput" class="field-label">COUNTRY</label>
+            <input type="text" id="countryInput" class="field-input" value="INDIA" required />
+          </div>
+        </div>
+
+        <!-- PAYMENT DETAILS -->
+        <h2 class="section-heading heading-payment">PAYMENT DETAILS</h2>
+
+        <div class="payment-card-selector">
+          <div class="payment-card-icon-box">
+            <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.5" y="0.5" width="17" height="12" rx="1.5" fill="#FFFFFF"/>
+              <rect x="0" y="3" width="18" height="2.5" fill="#000000"/>
+              <rect x="2.5" y="8" width="4" height="1.5" fill="#000000"/>
+            </svg>
+          </div>
+          <div class="payment-card-info">
+            <div class="payment-card-title">CREDIT / DEBIT CARD</div>
+            <div class="payment-card-sub">Visa, Mastercard, Amex, Discover</div>
+          </div>
+          <div class="payment-card-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.8 6.8L9 1" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="form-group group-cardholder">
+          <label for="cardNameInput" class="field-label">CARDHOLDER NAME</label>
+          <input type="text" id="cardNameInput" class="field-input" placeholder="FULL NAME ON CARD" required />
+        </div>
+
+        <div class="form-group">
+          <label for="cardNumberInput" class="field-label">CARD NUMBER</label>
+          <input type="text" id="cardNumberInput" class="field-input" placeholder="1234 5678 9012 3456" maxlength="19" required />
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="expMonthSelect" class="field-label">EXP MONTH</label>
+            <div class="select-wrapper">
+              <select id="expMonthSelect" class="field-select" required>
+                <option value="">MM</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+              </select>
+              <span class="select-arrows">
+                <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+                  <path d="M1.5 4.2L4 1.5L6.5 4.2" stroke="#131313" stroke-width="1.2"/>
+                  <path d="M1.5 7.8L4 10.5L6.5 7.8" stroke="#131313" stroke-width="1.2"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expYearSelect" class="field-label">EXP YEAR</label>
+            <div class="select-wrapper">
+              <select id="expYearSelect" class="field-select" required>
+                <option value="">YYYY</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+                <option value="2032">2032</option>
+              </select>
+              <span class="select-arrows">
+                <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+                  <path d="M1.5 4.2L4 1.5L6.5 4.2" stroke="#131313" stroke-width="1.2"/>
+                  <path d="M1.5 7.8L4 10.5L6.5 7.8" stroke="#131313" stroke-width="1.2"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cvcInput" class="field-label">SECURITY CODE</label>
+            <input type="text" id="cvcInput" class="field-input" placeholder="CVC" maxlength="4" required />
+          </div>
+        </div>
+
+        <div class="secure-banner">
+          <div class="secure-lock-icon">
+            <svg width="13" height="15" viewBox="0 0 13 15" fill="none">
+              <rect x="1.5" y="6.5" width="10" height="7.5" rx="1.5" stroke="#131313" stroke-width="1.2"/>
+              <path d="M3.5 6.5V4.5C3.5 2.84315 4.84315 1.5 6.5 1.5C8.15685 1.5 9.5 2.84315 9.5 4.5V6.5" stroke="#131313" stroke-width="1.2"/>
+              <circle cx="6.5" cy="10.2" r="1" fill="#131313"/>
+            </svg>
+          </div>
+          <div class="secure-banner-text">
+            <div class="secure-banner-title">SECURE PAYMENT</div>
+            <div class="secure-banner-sub">All transactions are encrypted and secure</div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-order-btn" id="submitOrderBtn">SUBMIT ORDER</button>
+      </form>
+    </section>
+
+    <!-- Right Column: Order Summary & Preview -->
+    <section class="checkout-right">
+      <div class="summary-top-bar">
+        <a href="inventory.html" class="close-btn" aria-label="Close order summary">
+          <span class="close-line line-1"></span>
+          <span class="close-line line-2"></span>
+        </a>
+        <span class="summary-title">ORDER SUMMARY</span>
+      </div>
+
+      <!-- Preview Box -->
+      <div class="summary-preview-frame" id="summaryPreviewFrame">
+        <div class="summary-case-stack" id="summaryCaseStack">
+          <img src="../assets/case-white.png" alt="Phone Case" class="summary-case-img" id="summaryCaseImg" />
+          <div class="summary-sticker-surface" id="summaryStickerSurface"></div>
+          <div class="summary-charm-layer" id="summaryCharmLayer"></div>
+        </div>
+      </div>
+
+      <!-- Order Summary Receipt -->
+      <div class="summary-receipt">
+        <div class="summary-receipt-header">
+          <span>DESCRIPTION</span>
+          <span>PRICE</span>
+        </div>
+
+        <div class="summary-receipt-lines" id="summaryReceiptLines"></div>
+
+        <!-- Calculated Delivery Charges Row -->
+        <div class="summary-delivery-section">
+          <div class="receipt-row delivery-row">
+            <span class="receipt-item-name" id="deliveryLabel">Delivery Charges (enter address)</span>
+            <span class="receipt-item-leader"></span>
+            <span class="receipt-item-price" id="deliveryPrice">--</span>
+          </div>
+        </div>
+
+        <!-- Total Row -->
+        <div class="receipt-row total-row">
+          <span class="receipt-item-name">TOTAL</span>
+          <span class="receipt-item-leader"></span>
+          <span class="receipt-item-price" id="totalPrice">₹0.00</span>
+        </div>
+      </div>
+    </section>
+    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a></footer>
+  </div>
+
+  <script>
+    const CASE_IMAGE_MAP = {
+      red: '../assets/case-red.png',
+      white: '../assets/case-white.png',
+      blue: '../assets/case-blue.png',
+      black: '../assets/case-black.png'
+    };
+
+    // Fallback default order matching screenshot if user visits checkout.html directly
+    const DEFAULT_ORDER = {
+      model: 'IPHONE 16',
+      caseColor: 'white',
+      bgColor: '#5DC6E8',
+      includeCase: true,
+      caseLabel: 'IPhone 16: P_Cover2',
+      casePrice: 2499.00,
+      stickers: [
+        {
+          id: 's2',
+          name: 'S_SpiderPunk',
+          price: 249.00,
+          src: '../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png',
+          left: 80,
+          top: 138,
+          width: 143,
+          height: 255,
+          rotate: 0,
+          zIndex: 14
+        },
+        {
+          id: 's3',
+          name: 'S_SpiderIDCard',
+          price: 259.00,
+          src: '../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png',
+          left: 142.5,
+          top: 211.5,
+          width: 143,
+          height: 104,
+          rotate: 90,
+          zIndex: 11
+        }
+      ],
+      charm: {
+        id: 'c1',
+        name: 'STAR_Charm',
+        price: 649.00,
+        src: '../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png',
+        left: 225,
+        top: 110,
+        width: 166,
+        height: 254,
+        rotate: 0,
+        loopTop: 126
+      }
+    };
+
+    let rawOrder = localStorage.getItem('hotcatpics_current_order');
+    if (!rawOrder && window.name && window.name.startsWith('{')) {
+      try {
+        const winStore = JSON.parse(window.name);
+        if (winStore && winStore.currentOrder) {
+          rawOrder = JSON.stringify(winStore.currentOrder);
+        }
+      } catch (e) {}
+    }
+    let order = DEFAULT_ORDER;
+    if (rawOrder) {
+      try {
+        const parsed = JSON.parse(rawOrder);
+        // Use saved order if it has at least a case, sticker, or charm
+        if (parsed && (parsed.includeCase || (parsed.stickers && parsed.stickers.length) || parsed.charm)) {
+          order = parsed;
+        }
+      } catch (e) {
+        order = DEFAULT_ORDER;
+      }
+    }
+
+    const summaryPreviewFrame = document.getElementById('summaryPreviewFrame');
+    const summaryCaseImg = document.getElementById('summaryCaseImg');
+    const summaryStickerSurface = document.getElementById('summaryStickerSurface');
+    const summaryCharmLayer = document.getElementById('summaryCharmLayer');
+    const summaryReceiptLines = document.getElementById('summaryReceiptLines');
+    const deliveryLabel = document.getElementById('deliveryLabel');
+    const deliveryPriceEl = document.getElementById('deliveryPrice');
+    const totalPriceEl = document.getElementById('totalPrice');
+
+    const emailInput = document.getElementById('emailInput');
+    const addressInput = document.getElementById('addressInput');
+    const aptInput = document.getElementById('aptInput');
+    const cityInput = document.getElementById('cityInput');
+    const stateInput = document.getElementById('stateInput');
+    const zipInput = document.getElementById('zipInput');
+    const countryInput = document.getElementById('countryInput');
+    const cardNumberInput = document.getElementById('cardNumberInput');
+    const checkoutForm = document.getElementById('checkoutForm');
+    const submitOrderBtn = document.getElementById('submitOrderBtn');
+
+    // Render the customized case, stickers, and charm inside the Order Summary Preview
+    function renderSummaryPreview() {
+      summaryPreviewFrame.style.backgroundColor = order.bgColor || '#5DC6E8';
+      summaryCaseImg.src = CASE_IMAGE_MAP[order.caseColor] || CASE_IMAGE_MAP.white;
+
+      summaryStickerSurface.innerHTML = '';
+      if (Array.isArray(order.stickers)) {
+        order.stickers.forEach((sticker) => {
+          const sImg = document.createElement('img');
+          sImg.src = sticker.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+          sImg.alt = sticker.name;
+          sImg.className = 'summary-placed-sticker';
+          sImg.style.left = `${sticker.left}px`;
+          sImg.style.top = `${sticker.top}px`;
+          sImg.style.width = `${sticker.width}px`;
+          sImg.style.height = `${sticker.height}px`;
+          sImg.style.zIndex = String(sticker.zIndex || 2);
+          if (sticker.rotate) {
+            sImg.style.transform = `rotate(${sticker.rotate}deg)`;
+          }
+          summaryStickerSurface.appendChild(sImg);
+        });
+      }
+
+      summaryCharmLayer.innerHTML = '';
+      if (order.charm) {
+        const cImg = document.createElement('img');
+        cImg.src = order.charm.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+        cImg.alt = order.charm.name;
+        cImg.className = 'summary-placed-charm';
+        cImg.style.left = `${order.charm.left}px`;
+        cImg.style.top = `${order.charm.top}px`;
+        cImg.style.width = `${order.charm.width}px`;
+        cImg.style.height = `${order.charm.height}px`;
+        if (order.charm.rotate) {
+          cImg.style.transform = `rotate(${order.charm.rotate}deg)`;
+        }
+
+        const loopEl = document.createElement('div');
+        loopEl.className = 'summary-charm-loop';
+        loopEl.style.top = `${order.charm.loopTop || 118}px`;
+
+        summaryCharmLayer.appendChild(cImg);
+        summaryCharmLayer.appendChild(loopEl);
+      }
+    }
+
+    function createReceiptRow(label, priceNum) {
+      const row = document.createElement('div');
+      row.className = 'receipt-row';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'receipt-item-name';
+      nameSpan.textContent = label;
+
+      const leaderSpan = document.createElement('span');
+      leaderSpan.className = 'receipt-item-leader';
+
+      const priceSpan = document.createElement('span');
+      priceSpan.className = 'receipt-item-price';
+      priceSpan.textContent = `₹${priceNum.toFixed(2)}`;
+
+      row.appendChild(nameSpan);
+      row.appendChild(leaderSpan);
+      row.appendChild(priceSpan);
+      return row;
+    }
+
+    // Calculate subtotal from items
+    let itemsSubtotal = 0;
+
+    function renderOrderLines() {
+      summaryReceiptLines.innerHTML = '';
+      itemsSubtotal = 0;
+
+      if (Array.isArray(order.stickers)) {
+        order.stickers.forEach((sticker) => {
+          const p = Number(sticker.price) || 0;
+          itemsSubtotal += p;
+          summaryReceiptLines.appendChild(createReceiptRow(sticker.name, p));
+        });
+      }
+
+      if (order.includeCase !== false) {
+        const casePrice = Number(order.casePrice) || 2499.00;
+        itemsSubtotal += casePrice;
+        summaryReceiptLines.appendChild(createReceiptRow(order.caseLabel || 'IPhone 16: P_Cover2', casePrice));
+      }
+
+      if (order.charm) {
+        const charmPrice = Number(order.charm.price) || 649.00;
+        itemsSubtotal += charmPrice;
+        summaryReceiptLines.appendChild(createReceiptRow(order.charm.name || 'STAR_Charm', charmPrice));
+      }
+    }
+
+    // ---- Delivery charge engine (all amounts in INR, excl. items) ----
+    const DELIVERY_RATES = {
+      metro: 149.00,     // major metro cities
+      standard: 199.00,  // rest of India
+      remote: 249.00,    // North-East, J&K / Ladakh, islands, Sikkim
+      intlNear: 799.00,  // neighbouring / nearby countries
+      intlFar: 1199.00   // rest of the world
+    };
+
+    const METRO_PIN3 = ['110', '400', '401', '410', '411', '560', '600', '500', '700', '380', '122', '201'];
+    const REMOTE_PIN_PREFIXES = ['78', '79', '18', '19', '737', '744', '796', '797', '798', '799'];
+    const METRO_CITIES = ['DELHI', 'NEW DELHI', 'MUMBAI', 'PUNE', 'BENGALURU', 'BANGALORE', 'CHENNAI', 'HYDERABAD', 'KOLKATA', 'AHMEDABAD', 'GURGAON', 'GURUGRAM', 'NOIDA'];
+    const REMOTE_STATES = ['ASSAM', 'ARUNACHAL PRADESH', 'MANIPUR', 'MEGHALAYA', 'MIZORAM', 'NAGALAND', 'TRIPURA', 'SIKKIM', 'JAMMU AND KASHMIR', 'JAMMU & KASHMIR', 'LADAKH', 'ANDAMAN AND NICOBAR ISLANDS', 'ANDAMAN & NICOBAR', 'LAKSHADWEEP'];
+    const NEAR_COUNTRIES = ['NEPAL', 'BHUTAN', 'SRI LANKA', 'BANGLADESH', 'MALDIVES', 'SINGAPORE', 'UAE', 'UNITED ARAB EMIRATES', 'THAILAND', 'MALAYSIA', 'INDONESIA', 'PAKISTAN', 'MYANMAR', 'OMAN', 'QATAR', 'SAUDI ARABIA', 'KUWAIT', 'BAHRAIN'];
+
+    let currentDelivery = { charge: 0, label: 'Enter address to calculate', ready: false };
+
+    function calculateDeliveryCharges() {
+      const rawCountry = (countryInput.value || '').trim().toUpperCase();
+      const country = rawCountry === 'IN' || rawCountry === '' ? 'INDIA' : rawCountry;
+      const state = (stateInput.value || '').trim().toUpperCase();
+      const city = (cityInput.value || '').trim().toUpperCase();
+      const zip = (zipInput.value || '').replace(/\s/g, '');
+
+      let charge = 0;
+      let zoneText = '';
+      let ready = true;
+
+      if (country !== 'INDIA') {
+        const near = NEAR_COUNTRIES.includes(country);
+        charge = near ? DELIVERY_RATES.intlNear : DELIVERY_RATES.intlFar;
+        zoneText = `International - ${country}`;
+      } else {
+        const pinValid = /^[1-9][0-9]{5}$/.test(zip);
+        if (pinValid && (REMOTE_PIN_PREFIXES.some((p) => zip.startsWith(p)))) {
+          charge = DELIVERY_RATES.remote;
+          zoneText = `Remote - ${state || zip}`;
+        } else if ((pinValid && METRO_PIN3.includes(zip.slice(0, 3))) || METRO_CITIES.includes(city)) {
+          charge = DELIVERY_RATES.metro;
+          zoneText = `Metro - ${city || zip}`;
+        } else if (REMOTE_STATES.includes(state)) {
+          charge = DELIVERY_RATES.remote;
+          zoneText = `Remote - ${state}`;
+        } else if (pinValid || state || city) {
+          charge = DELIVERY_RATES.standard;
+          zoneText = `Standard - ${state || city || zip}`;
+        } else {
+          ready = false;
+        }
+      }
+
+      if (ready) {
+        currentDelivery = { charge, label: `Delivery Charges (${zoneText})`, ready: true };
+        deliveryLabel.textContent = currentDelivery.label;
+        deliveryPriceEl.textContent = `₹${charge.toFixed(2)}`;
+      } else {
+        currentDelivery = { charge: 0, label: 'Enter address to calculate', ready: false };
+        deliveryLabel.textContent = 'Delivery Charges (enter address)';
+        deliveryPriceEl.textContent = '--';
+      }
+
+      const grandTotal = itemsSubtotal + currentDelivery.charge;
+      totalPriceEl.textContent = `₹${grandTotal.toFixed(2)}`;
+    }
+
+    [cityInput, stateInput, zipInput, countryInput].forEach((inputEl) => {
+      inputEl.addEventListener('input', calculateDeliveryCharges);
+    });
+
+    // Format card number with spaces every 4 digits
+    cardNumberInput.addEventListener('input', (e) => {
+      const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+      const groups = digits.match(/.{1,4}/g);
+      e.target.value = groups ? groups.join(' ') : '';
+    });
+
+    // Submit order handler: validates the address, then stores the final order with delivery + total
+    checkoutForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      calculateDeliveryCharges();
+
+      const countryUp = (countryInput.value || '').trim().toUpperCase();
+      const isIndia = countryUp === '' || countryUp === 'INDIA' || countryUp === 'IN';
+      const required = [emailInput, addressInput, cityInput, stateInput, zipInput, countryInput];
+      let firstBad = null;
+      required.forEach((el) => {
+        const bad = !el.value.trim() || (el === zipInput && isIndia && !/^[1-9][0-9]{5}$/.test(el.value.replace(/\s/g, '')));
+        el.style.borderColor = bad ? '#D00000' : '';
+        if (bad && !firstBad) firstBad = el;
+      });
+      if (firstBad) {
+        firstBad.focus();
+        submitOrderBtn.textContent = firstBad === zipInput && isIndia ? 'ENTER A VALID 6-DIGIT PIN' : 'COMPLETE ALL ADDRESS FIELDS';
+        setTimeout(() => { submitOrderBtn.textContent = 'SUBMIT ORDER'; }, 2200);
+        return;
+      }
+
+      const record = {
+        id: 'order_' + Date.now(),
+        placedAt: new Date().toISOString(),
+        email: emailInput.value.trim(),
+        address: {
+          line1: addressInput.value.trim(),
+          line2: aptInput.value.trim(),
+          city: cityInput.value.trim(),
+          state: stateInput.value.trim(),
+          zip: zipInput.value.trim(),
+          country: countryInput.value.trim()
+        },
+        items: order,
+        subtotal: itemsSubtotal,
+        delivery: currentDelivery.charge,
+        deliveryZone: currentDelivery.label,
+        total: itemsSubtotal + currentDelivery.charge
+      };
+      try {
+        const prev = JSON.parse(localStorage.getItem('hotcatpics_orders') || '[]');
+        prev.push(record);
+        localStorage.setItem('hotcatpics_orders', JSON.stringify(prev));
+      } catch (err) {}
+
+      if (location.protocol.startsWith('http')) {
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        }).catch(() => {});
+      }
+
+      submitOrderBtn.textContent = `ORDER SUBMITTED ✓  TOTAL ₹${record.total.toFixed(2)}`;
+      submitOrderBtn.classList.add('submitted');
+      setTimeout(() => {
+        submitOrderBtn.textContent = 'SUBMIT ORDER';
+        submitOrderBtn.classList.remove('submitted');
+      }, 3000);
+    });
+
+    renderSummaryPreview();
+    renderOrderLines();
+    calculateDeliveryCharges();
+  </script>
+</body>
+</html>
+

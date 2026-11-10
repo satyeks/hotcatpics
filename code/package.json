@@ -1,0 +1,13 @@
+{
+  "name": "hotcatpics",
+  "version": "1.0.0",
+  "description": "HOTCATPICS custom phone cases, stickers, charms & community presets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "@netlify/functions": "^3.0.0"
+  }
+}

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOTCATPICS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=10" />
+  <style>
+    /* Clip stickers to the rounded case body so edges never spill past the corners */
+    .case-sticker-surface,
+    .preset-sticker-surface,
+    .detail-sticker-surface,
+    .summary-sticker-surface {
+      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
+      clip-path: inset(29px 96px 29px 88px round 38px) !important;
+    }
+    *, html, body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    html, body {
+      overflow-x: hidden !important;
+    }
+    .preset-sticker-surface,
+    .preset-charm-layer,
+    .detail-sticker-surface,
+    .detail-charm-layer {
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .preset-sticker-surface,
+    .detail-sticker-surface { z-index: 20 !important; }
+    .preset-charm-layer,
+    .detail-charm-layer { z-index: 30 !important; }
+  </style>
+  <link rel="stylesheet" href="responsive.css?v=1" />
+  <script src="responsive.js"></script>
+</head>
+<body>
+  <div class="landing-page" id="landingPage">
+    <!-- Top Navigation / Header -->
+    <header class="header">
+      <a href="index.html" class="logo" id="logoLink">HOTCATPICS</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-item nav-presets active" id="presetsNavLink">PRESETS</a>
+        <a href="inventory.html" class="nav-item nav-inventory">INVENTORY</a>
+        <a href="#" class="nav-item nav-profile">PROFILE</a>
+      </nav>
+
+      <div class="header-right">
+        <a href="#" class="nav-item nav-wishlist" id="navWishlist">WISHLIST 0</a>
+        <a href="#" class="nav-item nav-cart" id="navCart">CART 0</a>
+      </div>
+    </header>
+
+    <!-- Sub-Navigation / Category Filter (hidden when a preset is opened in split view) -->
+    <div class="filter-bar" id="filterBar">
+      <button class="close-btn" id="clearPresetsBtn" aria-label="Clear filter">
+        <span class="close-line line-1"></span>
+        <span class="close-line line-2"></span>
+      </button>
+      <div class="filter-categories">
+        <a href="#" class="filter-item filter-bottle">BOTTLE</a>
+        <a href="#" class="filter-item filter-cases active">CASES</a>
+        <a href="#" class="filter-item filter-laptop">LAPTOP</a>
+        <a href="#" class="filter-item filter-tshirts">T-SHIRTS</a>
+      </div>
+    </div>
+
+    <!-- Scrollable Blocks Grid (4 columns default -> 2 columns on left when a preset is opened) -->
+    <main class="grid-container" id="presetsGrid"></main>
+
+    <!-- Right-Side Expanded Preset View (Shown when a preset block is clicked) -->
+    <button type="button" class="mobile-back-btn" id="mobileBackBtn">‹ BACK TO PRESETS</button>
+    <aside class="preset-detail-panel" id="presetDetailPanel">
+      <div class="detail-preview-box" id="detailPreviewBox">
+        <button type="button" class="preset-like-btn detail-like-btn" id="detailLikeBtn" aria-label="Add to wishlist"></button>
+        <div class="detail-case-stage" id="detailCaseStage">
+          <img src="../assets/case-white.png" alt="Preset Case" class="detail-case-img" id="detailCaseImg" />
+          <div class="detail-sticker-surface" id="detailStickerSurface"></div>
+          <div class="detail-charm-layer" id="detailCharmLayer"></div>
+        </div>
+      </div>
+
+      <!-- Accumulated PRICE Row (excludes delivery charges) -->
+      <div class="detail-price-row">
+        <span class="detail-price-label">PRICE</span>
+        <span class="detail-price-leader"></span>
+        <span class="detail-price-value" id="detailPriceValue">₹0.00</span>
+      </div>
+
+      <!-- Action Buttons: ADD TO CART & BUY -->
+      <div class="detail-actions">
+        <button type="button" class="detail-btn btn-add-cart" id="detailAddToCartBtn">ADD TO CART</button>
+        <button type="button" class="detail-btn btn-buy-now" id="detailBuyBtn">BUY</button>
+      </div>
+    </aside>
+    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a></footer>
+  </div>
+
+  <script>
+    const CASE_IMAGE_MAP = {
+      red: '../assets/case-red.png',
+      white: '../assets/case-white.png',
+      blue: '../assets/case-blue.png',
+      black: '../assets/case-black.png'
+    };
+
+    const CASE_COLOR_CODES = {
+      red: 'P_Cover1',
+      white: 'P_Cover2',
+      blue: 'P_Cover3',
+      black: 'P_Cover4'
+    };
+
+    const landingPage = document.getElementById('landingPage');
+    const presetsNavLink = document.getElementById('presetsNavLink');
+    const navWishlist = document.getElementById('navWishlist');
+    const navCart = document.getElementById('navCart');
+    const clearPresetsBtn = document.getElementById('clearPresetsBtn');
+    const detailPreviewBox = document.getElementById('detailPreviewBox');
+    const detailLikeBtn = document.getElementById('detailLikeBtn');
+    const detailCaseImg = document.getElementById('detailCaseImg');
+    const detailStickerSurface = document.getElementById('detailStickerSurface');
+    const detailCharmLayer = document.getElementById('detailCharmLayer');
+    const detailPriceValue = document.getElementById('detailPriceValue');
+    const detailAddToCartBtn = document.getElementById('detailAddToCartBtn');
+    const detailBuyBtn = document.getElementById('detailBuyBtn');
+
+    // Clean up legacy v1 test presets
+    try {
+      localStorage.removeItem('hotcatpics_presets');
+      if (window.name && window.name.startsWith('{')) {
+        const legacy = JSON.parse(window.name);
+        if (legacy && legacy.presets && !legacy.v2) {
+          delete legacy.presets;
+          legacy.v2 = true;
+          window.name = JSON.stringify(legacy);
+        }
+      }
+    } catch (e) {}
+
+    function loadStore() {
+      let store = { v2: true };
+      try {
+        if (window.name && window.name.startsWith('{')) {
+          store = { ...store, ...JSON.parse(window.name) };
+        }
+      } catch (e) {}
+      try {
+        const lsPresets = localStorage.getItem('hotcatpics_presets_v2');
+        if (lsPresets) {
+          store.presets = JSON.parse(lsPresets);
+        }
+        const lsCart = localStorage.getItem('hotcatpics_cart_count');
+        if (lsCart !== null && store.cartCount === undefined) {
+          store.cartCount = parseInt(lsCart, 10) || 0;
+        }
+        const lsWish = localStorage.getItem('hotcatpics_wishlist');
+        if (lsWish) {
+          store.wishlist = JSON.parse(lsWish);
+        }
+      } catch (e) {}
+      return store;
+    }
+
+    function saveStore(updates) {
+      const store = { ...loadStore(), ...updates, v2: true };
+      try {
+        window.name = JSON.stringify(store);
+      } catch (e) {}
+      try {
+        if (store.presets !== undefined) {
+          localStorage.setItem('hotcatpics_presets_v2', JSON.stringify(store.presets));
+        }
+        if (store.cartCount !== undefined) {
+          localStorage.setItem('hotcatpics_cart_count', String(store.cartCount));
+        }
+        if (store.wishlist !== undefined) {
+          localStorage.setItem('hotcatpics_wishlist', JSON.stringify(store.wishlist));
+        }
+        if (store.currentOrder !== undefined) {
+          localStorage.setItem('hotcatpics_current_order', JSON.stringify(store.currentOrder));
+        }
+      } catch (e) {}
+    }
+
+    const HEART_SVG = '<svg width="16" height="15" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2C12 20.2 2.5 14 2.5 7.2C2.5 3.9 5.1 1.5 8.2 1.5C10.1 1.5 11.4 2.5 12 3.8C12.6 2.5 13.9 1.5 15.8 1.5C18.9 1.5 21.5 3.9 21.5 7.2C21.5 14 12 20.2 12 20.2Z"/></svg>';
+
+    let cartCount = loadStore().cartCount || 0;
+    navCart.textContent = `CART ${cartCount}`;
+
+    let wishlistOnlyMode = location.hash === '#wishlist';
+
+    function getPresetKey(preset, fallbackIdx) {
+      if (preset && preset.id) return String(preset.id);
+      return `preset_idx_${fallbackIdx || 0}`;
+    }
+
+    function getWishlistSet() {
+      const list = loadStore().wishlist;
+      return new Set(Array.isArray(list) ? list : []);
+    }
+
+    function syncWishlistHeader() {
+      const presets = Array.isArray(loadStore().presets) ? loadStore().presets : [];
+      const validKeys = new Set(presets.map((p, i) => getPresetKey(p, i)));
+      const wishSet = getWishlistSet();
+      // Keep only wishlist entries that correspond to existing presets (if presets are loaded)
+      let count = 0;
+      if (presets.length > 0) {
+        wishSet.forEach((k) => { if (validKeys.has(k)) count += 1; });
+      } else {
+        count = wishSet.size;
+      }
+      navWishlist.textContent = `WISHLIST ${count}`;
+      navWishlist.classList.toggle('active', wishlistOnlyMode);
+      presetsNavLink.classList.toggle('active', !wishlistOnlyMode);
+    }
+
+    function toggleWishlistForPreset(preset, fallbackIdx) {
+      const key = getPresetKey(preset, fallbackIdx);
+      const wishSet = getWishlistSet();
+      let delta = 1;
+      if (wishSet.has(key)) {
+        wishSet.delete(key);
+        delta = -1;
+      } else {
+        wishSet.add(key);
+        delta = 1;
+      }
+
+      const store = loadStore();
+      const list = Array.isArray(store.presets) ? store.presets : [];
+      const hit = list.find((p, i) => getPresetKey(p, i) === key);
+      if (hit) {
+        hit.wishlists = Math.max(0, (Number(hit.wishlists) || 0) + delta);
+      }
+
+      saveStore({ wishlist: Array.from(wishSet), presets: list });
+      syncWishlistHeader();
+      if (activePresetData && getPresetKey(activePresetData, activePresetIndex) === key) {
+        detailLikeBtn.classList.toggle('is-liked', wishSet.has(key));
+      }
+      renderSharedPresets();
+
+      if (preset && preset.id) {
+        fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {
+          method: 'POST',
+          body: JSON.stringify({ action: 'wishlist', id: preset.id, delta })
+        }).catch(() => {});
+      }
+    }
+
+    detailLikeBtn.innerHTML = HEART_SVG;
+    detailLikeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!activePresetData) return;
+      toggleWishlistForPreset(activePresetData, activePresetIndex);
+    });
+
+    const BLOCK_COLORS = ['#8783FF', '#F8D548', '#61C7E7', '#7B0000', '#C8C8C8', '#FF9393', '#2AB8E6', '#FDE7AC'];
+
+    // Count an order against the active preset (drives tie-break ranking)
+    function bumpOrders(preset) {
+      const store = loadStore();
+      const list = Array.isArray(store.presets) ? store.presets : [];
+      const hit = list.find((p) => p.id && p.id === preset.id);
+      if (hit) {
+        hit.orders = (hit.orders || 0) + 1;
+        saveStore({ presets: list });
+      }
+      if (preset && preset.id) {
+        fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {
+          method: 'POST',
+          body: JSON.stringify({ action: 'order', id: preset.id })
+        }).catch(() => {});
+      }
+    }
+
+    let activePresetIndex = null;
+    let activePresetData = null;
+
+    // Calculate accumulated price of all products in a preset (case + stickers + charm, excluding delivery)
+    function calculatePresetPrice(preset) {
+      let total = 2499.00; // Phone case base price
+      if (Array.isArray(preset.stickers)) {
+        preset.stickers.forEach((s) => {
+          const p = Number(s.price) || 249.00;
+          total += p;
+        });
+      }
+      if (preset.charm) {
+        const cp = Number(preset.charm.price) || 649.00;
+        total += cp;
+      }
+      return total;
+    }
+
+    // Open a preset in the right-hand split view
+    function openPresetDetail(preset, blockEl, idx) {
+      activePresetIndex = idx;
+      activePresetData = preset;
+
+      document.querySelectorAll('.block').forEach((b) => b.classList.remove('active-preset'));
+      blockEl.classList.add('active-preset');
+
+      // Use the preset's background color or the block's background color
+      const blockBg = preset.bgColor || blockEl.style.backgroundColor || '#5DC6E8';
+      detailPreviewBox.style.backgroundColor = blockBg;
+
+      detailCaseImg.src = CASE_IMAGE_MAP[preset.caseColor] || CASE_IMAGE_MAP.white;
+
+      detailStickerSurface.innerHTML = '';
+      if (Array.isArray(preset.stickers)) {
+        preset.stickers.forEach((sticker) => {
+          const sImg = document.createElement('img');
+          sImg.src = sticker.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+          sImg.alt = sticker.name || 'Sticker';
+          sImg.className = 'detail-placed-sticker';
+          sImg.style.left = `${sticker.left}px`;
+          sImg.style.top = `${sticker.top}px`;
+          sImg.style.width = `${sticker.width}px`;
+          sImg.style.height = `${sticker.height}px`;
+          sImg.style.zIndex = String(sticker.zIndex || 22);
+          if (sticker.rotate) {
+            sImg.style.transform = `rotate(${sticker.rotate}deg)`;
+          }
+          detailStickerSurface.appendChild(sImg);
+        });
+      }
+
+      detailCharmLayer.innerHTML = '';
+      if (preset.charm) {
+        const cImg = document.createElement('img');
+        cImg.src = preset.charm.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+        cImg.alt = preset.charm.name || 'Charm';
+        cImg.className = 'detail-placed-charm';
+        cImg.style.left = `${preset.charm.left}px`;
+        cImg.style.top = `${preset.charm.top}px`;
+        cImg.style.width = `${preset.charm.width}px`;
+        cImg.style.height = `${preset.charm.height}px`;
+        if (preset.charm.rotate) {
+          cImg.style.transform = `rotate(${preset.charm.rotate}deg)`;
+        }
+
+        const loopEl = document.createElement('div');
+        loopEl.className = 'detail-charm-loop';
+        loopEl.style.top = `${preset.charm.loopTop || 120}px`;
+
+        detailCharmLayer.appendChild(cImg);
+        detailCharmLayer.appendChild(loopEl);
+      }
+
+      const accumulatedPrice = calculatePresetPrice(preset);
+      detailPriceValue.textContent = `₹${accumulatedPrice.toFixed(2)}`;
+
+      const isLiked = getWishlistSet().has(getPresetKey(preset, idx));
+      detailLikeBtn.classList.toggle('is-liked', isLiked);
+
+      landingPage.classList.add('split-view');
+      if (window.innerWidth <= 820) window.scrollTo(0, 0);
+      updateCanvasHeight();
+    }
+
+    function closePresetDetail() {
+      activePresetIndex = null;
+      activePresetData = null;
+      document.querySelectorAll('.block').forEach((b) => b.classList.remove('active-preset'));
+      landingPage.classList.remove('split-view');
+      updateCanvasHeight();
+    }
+
+    // Clicking PRESETS nav link returns to full 4-column grid and exits wishlist filter
+    presetsNavLink.addEventListener('click', (e) => {
+      if (landingPage.classList.contains('split-view') || wishlistOnlyMode) {
+        e.preventDefault();
+        wishlistOnlyMode = false;
+        if (location.hash === '#wishlist') history.replaceState(null, '', 'index.html');
+        closePresetDetail();
+        syncWishlistHeader();
+        renderSharedPresets();
+      }
+    });
+
+    // Clicking WISHLIST in top-right filters the grid to wishlisted presets (or back to all)
+    navWishlist.addEventListener('click', (e) => {
+      e.preventDefault();
+      wishlistOnlyMode = !wishlistOnlyMode;
+      closePresetDetail();
+      syncWishlistHeader();
+      renderSharedPresets();
+    });
+
+    document.getElementById('mobileBackBtn').addEventListener('click', closePresetDetail);
+
+    if (clearPresetsBtn) {
+      clearPresetsBtn.addEventListener('click', () => {
+        if (wishlistOnlyMode) {
+          wishlistOnlyMode = false;
+          syncWishlistHeader();
+        }
+        closePresetDetail();
+        renderSharedPresets();
+      });
+    }
+
+    // ADD TO CART button in detail view
+    detailAddToCartBtn.addEventListener('click', () => {
+      if (!activePresetData) return;
+      cartCount += 1;
+      navCart.textContent = `CART ${cartCount}`;
+      saveStore({ cartCount });
+      bumpOrders(activePresetData);
+
+      const origText = detailAddToCartBtn.textContent;
+      detailAddToCartBtn.textContent = 'ADDED TO CART';
+      setTimeout(() => {
+        detailAddToCartBtn.textContent = origText;
+      }, 1300);
+    });
+
+    // BUY button in detail view -> passes all products of this preset to checkout.html
+    detailBuyBtn.addEventListener('click', () => {
+      if (!activePresetData) return;
+      cartCount += 1;
+      navCart.textContent = `CART ${cartCount}`;
+
+      const modelName = activePresetData.model === 'IPHONE 16' ? 'IPhone 16' : (activePresetData.model || 'IPhone 16');
+      const coverCode = CASE_COLOR_CODES[activePresetData.caseColor] || 'P_Cover2';
+
+      const currentOrder = {
+        presetId: activePresetData.id || null,
+        model: activePresetData.model || 'IPHONE 16',
+        caseColor: activePresetData.caseColor || 'white',
+        bgColor: activePresetData.bgColor || '#5DC6E8',
+        includeCase: true,
+        caseLabel: `${modelName}: ${coverCode}`,
+        casePrice: 2499.00,
+        stickers: Array.isArray(activePresetData.stickers) ? activePresetData.stickers : [],
+        charm: activePresetData.charm || null
+      };
+
+      saveStore({ cartCount, currentOrder });
+      bumpOrders(activePresetData);
+      window.location.href = 'checkout.html';
+    });
+
+    // Keep empty space above the footer: canvas grows with the content
+    function updateCanvasHeight() {
+      const grid = document.getElementById('presetsGrid');
+      const detailPanel = document.getElementById('presetDetailPanel');
+      let bottom = grid.offsetTop + grid.offsetHeight;
+      if (landingPage.classList.contains('split-view')) {
+        bottom = Math.max(bottom, detailPanel.offsetTop + detailPanel.offsetHeight);
+      }
+      landingPage.style.minHeight = `${Math.max(900, bottom + 160)}px`;
+    }
+
+    function renderSharedPresets() {
+      const grid = document.getElementById('presetsGrid');
+      const currentStore = loadStore();
+      const presets = Array.isArray(currentStore.presets) ? currentStore.presets : [];
+      grid.innerHTML = '';
+
+      const wishSet = getWishlistSet();
+
+      // Sort presets from most wishlisted to least wishlisted (ties -> most ordered -> newest first)
+      const sorted = presets
+        .map((p, i) => ({
+          p,
+          i,
+          w: Math.max(Number(p.wishlists) || 0, wishSet.has(getPresetKey(p, i)) ? 1 : 0)
+        }))
+        .sort((a, b) => (b.w - a.w) || ((b.p.orders || 0) - (a.p.orders || 0)) || (b.i - a.i))
+        .map((x) => x.p)
+        .filter((p, i) => !wishlistOnlyMode || wishSet.has(getPresetKey(p, i)));
+
+      sorted.forEach((preset, idx) => {
+        const block = document.createElement('div');
+        block.className = 'block has-preset';
+        block.style.backgroundColor = preset.bgColor || BLOCK_COLORS[idx % BLOCK_COLORS.length];
+        grid.appendChild(block);
+
+        const presetStage = document.createElement('div');
+        presetStage.className = 'preset-case-stage';
+
+        const caseImg = document.createElement('img');
+        caseImg.src = CASE_IMAGE_MAP[preset.caseColor] || CASE_IMAGE_MAP.white;
+        caseImg.alt = preset.model || 'iPhone 16 Case';
+        caseImg.className = 'preset-case-img';
+        presetStage.appendChild(caseImg);
+
+        const stickerSurface = document.createElement('div');
+        stickerSurface.className = 'preset-sticker-surface';
+        if (Array.isArray(preset.stickers)) {
+          preset.stickers.forEach((sticker) => {
+            const sImg = document.createElement('img');
+            sImg.src = sticker.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+            sImg.alt = sticker.name || 'Sticker';
+            sImg.className = 'preset-placed-sticker';
+            sImg.style.left = `${sticker.left}px`;
+            sImg.style.top = `${sticker.top}px`;
+            sImg.style.width = `${sticker.width}px`;
+            sImg.style.height = `${sticker.height}px`;
+            sImg.style.zIndex = String(sticker.zIndex || 22);
+            if (sticker.rotate) {
+              sImg.style.transform = `rotate(${sticker.rotate}deg)`;
+            }
+            stickerSurface.appendChild(sImg);
+          });
+        }
+        presetStage.appendChild(stickerSurface);
+
+        if (preset.charm) {
+          const charmLayer = document.createElement('div');
+          charmLayer.className = 'preset-charm-layer';
+
+          const cImg = document.createElement('img');
+          cImg.src = preset.charm.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+          cImg.alt = preset.charm.name || 'Charm';
+          cImg.className = 'preset-placed-charm';
+          cImg.style.left = `${preset.charm.left}px`;
+          cImg.style.top = `${preset.charm.top}px`;
+          cImg.style.width = `${preset.charm.width}px`;
+          cImg.style.height = `${preset.charm.height}px`;
+          if (preset.charm.rotate) {
+            cImg.style.transform = `rotate(${preset.charm.rotate}deg)`;
+          }
+
+          const loopEl = document.createElement('div');
+          loopEl.className = 'preset-charm-loop';
+          loopEl.style.top = `${preset.charm.loopTop || 120}px`;
+
+          charmLayer.appendChild(cImg);
+          charmLayer.appendChild(loopEl);
+          presetStage.appendChild(charmLayer);
+        }
+
+        block.appendChild(presetStage);
+
+        // Minimalistic heart button to like / add preset to wishlist
+        const likeBtn = document.createElement('button');
+        likeBtn.type = 'button';
+        const isLiked = wishSet.has(getPresetKey(preset, idx));
+        likeBtn.className = 'preset-like-btn' + (isLiked ? ' is-liked' : '');
+        likeBtn.setAttribute('aria-label', 'Add to wishlist');
+        likeBtn.innerHTML = HEART_SVG;
+        likeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleWishlistForPreset(preset, idx);
+        });
+        block.appendChild(likeBtn);
+
+        // Clicking a populated preset block opens it in the split-view detail panel
+        block.onclick = () => {
+          if (activePresetIndex === idx && landingPage.classList.contains('split-view')) {
+            closePresetDetail();
+          } else {
+            openPresetDetail(preset, block, idx);
+          }
+        };
+      });
+      syncWishlistHeader();
+      updateCanvasHeight();
+    }
+
+    async function syncSharedPresetsFromServer() {
+      const CLOUD_URL = 'https://ntfy.sh/hotcatpics_cloud_v2_9380ba82';
+      try {
+        const res = await fetch(`${CLOUD_URL}/json?poll=1&since=all`);
+        const text = await res.text();
+        const lines = text.trim().split('\n').filter(Boolean);
+
+        const byId = new Map();
+        const localPresets = Array.isArray(loadStore().presets) ? loadStore().presets : [];
+        const cloudPresetIds = new Set();
+
+        for (const line of lines) {
+          try {
+            const env = JSON.parse(line);
+            if (env.event !== 'message' || !env.message) continue;
+            const payload = JSON.parse(env.message);
+            if (payload.action === 'share' && payload.preset && payload.preset.id) {
+              cloudPresetIds.add(payload.preset.id);
+              if (!byId.has(payload.preset.id)) {
+                byId.set(payload.preset.id, {
+                  wishlists: 0,
+                  orders: 0,
+                  ...payload.preset
+                });
+              }
+            } else if (payload.action === 'wishlist' && payload.id && byId.has(payload.id)) {
+              const p = byId.get(payload.id);
+              p.wishlists = Math.max(0, (Number(p.wishlists) || 0) + (Number(payload.delta) === -1 ? -1 : 1));
+            } else if (payload.action === 'order' && payload.id && byId.has(payload.id)) {
+              const p = byId.get(payload.id);
+              p.orders = (Number(p.orders) || 0) + 1;
+            }
+          } catch (e) {}
+        }
+
+        // Push any locally-created presets not yet in the cloud stream
+        for (const lp of localPresets) {
+          if (lp && lp.id && !cloudPresetIds.has(lp.id)) {
+            byId.set(lp.id, { wishlists: 0, orders: 0, ...lp });
+            fetch(CLOUD_URL, {
+              method: 'POST',
+              body: JSON.stringify({ action: 'share', preset: lp })
+            }).catch(() => {});
+          }
+        }
+
+        saveStore({ presets: Array.from(byId.values()) });
+        renderSharedPresets();
+      } catch (e) {}
+    }
+
+    renderSharedPresets();
+    syncSharedPresetsFromServer();
+
+    // Real-time live subscription so presets shared or wishlisted by friends appear immediately
+    try {
+      const es = new EventSource('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82/sse');
+      es.onmessage = () => {
+        syncSharedPresetsFromServer();
+      };
+    } catch (e) {}
+  </script>
+</body>
+</html>

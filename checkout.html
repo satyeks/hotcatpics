@@ -376,7 +376,7 @@
       if (Array.isArray(order.stickers)) {
         order.stickers.forEach((sticker) => {
           const sImg = document.createElement('img');
-          sImg.src = sticker.src;
+          sImg.src = sticker.src.replace(/^\.\.\//, '');
           sImg.alt = sticker.name;
           sImg.className = 'summary-placed-sticker';
           sImg.style.left = `${sticker.left}px`;
@@ -394,7 +394,7 @@
       summaryCharmLayer.innerHTML = '';
       if (order.charm) {
         const cImg = document.createElement('img');
-        cImg.src = order.charm.src;
+        cImg.src = order.charm.src.replace(/^\.\.\//, '');
         cImg.alt = order.charm.name;
         cImg.className = 'summary-placed-charm';
         cImg.style.left = `${order.charm.left}px`;

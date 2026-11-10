@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOTCATPICS - INVENTORY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="inventory.css?v=14" />
+  <style>
+    /* Clip stickers to the rounded case body so edges never spill past the corners */
+    .case-sticker-surface,
+    .preset-sticker-surface,
+    .detail-sticker-surface,
+    .summary-sticker-surface {
+      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
+      clip-path: inset(29px 96px 29px 88px round 38px) !important;
+    }
+    *, html, body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    html, body {
+      overflow-x: hidden !important;
+    }
+    /* Override any Safari cached CSS rules so stickers and charms always appear on top immediately */
+    .preview-case-stack {
+      overflow: visible !important;
+    }
+    .case-sticker-surface,
+    .case-charm-layer {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 374px !important;
+      height: 450px !important;
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .case-sticker-surface {
+      z-index: 20 !important;
+      pointer-events: auto !important;
+    }
+    .case-charm-layer {
+      z-index: 30 !important;
+      pointer-events: none !important;
+    }
+    .placed-sticker {
+      position: absolute !important;
+      object-fit: fill !important;
+      cursor: grab !important;
+      user-select: none !important;
+      -webkit-user-drag: none !important;
+      pointer-events: auto !important;
+    }
+    .placed-charm {
+      position: absolute !important;
+      object-fit: fill !important;
+      user-select: none !important;
+      -webkit-user-drag: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Smooth permanent UI transition for SHARE TO PRESET button */
+    .btn-share-preset {
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid #000000 !important;
+      background: #000000;
+      color: #FFFFFF;
+      transition:
+        background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.18s ease !important;
+    }
+    .btn-share-preset .btn-label-track {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 84px;
+      transform: translateY(0);
+      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .btn-share-preset .btn-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 42px;
+      flex-shrink: 0;
+    }
+    .btn-share-preset.is-shared {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+    }
+    .btn-share-preset.is-shared .btn-label-track {
+      transform: translateY(-42px);
+    }
+    .share-preset-col {
+      display: flex;
+      flex-direction: column;
+      width: 277px;
+    }
+    .share-preset-note {
+      margin-top: 10px;
+      font-family: 'Sometype Mono', monospace;
+      font-size: 11.5px;
+      line-height: 15px;
+      color: #555555;
+    }
+    .btn-proceed-buy.is-locked,
+    .btn-proceed-buy:disabled {
+      opacity: 0.35 !important;
+      cursor: not-allowed !important;
+      pointer-events: auto !important;
+      transform: none !important;
+    }
+    .btn-proceed-buy.is-locked:hover,
+    .btn-proceed-buy:disabled:hover {
+      opacity: 0.35 !important;
+    }
+  </style>
+  <link rel="stylesheet" href="responsive.css?v=1" />
+  <script src="responsive.js"></script>
+</head>
+<body>
+  <div class="inventory-page">
+    <!-- Group 24: Top Navigation / Header -->
+    <header class="header">
+      <a href="index.html" class="logo">HOTCATPICS</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-item nav-presets">PRESETS</a>
+        <a href="inventory.html" class="nav-item nav-inventory active">INVENTORY</a>
+        <a href="#" class="nav-item nav-profile">PROFILE</a>
+      </nav>
+
+      <div class="header-right">
+        <a href="index.html#wishlist" class="nav-item nav-wishlist" id="navWishlist">WISHLIST 0</a>
+        <a href="#" class="nav-item nav-cart" id="navCart">CART 0</a>
+      </div>
+    </header>
+
+    <!-- Group 25: Sub-Navigation / Filter Bars -->
+    <div class="sub-nav">
+      <!-- Group 12: Left Filter (STICKERS / CHARMS) -->
+      <div class="left-filter">
+        <button class="close-btn close-left" id="clearLeftFilter" aria-label="Clear left filter">
+          <span class="close-line line-1"></span>
+          <span class="close-line line-2"></span>
+        </button>
+        <a href="#" class="filter-item filter-stickers active" data-left-tab="stickers">STICKERS</a>
+        <a href="#" class="filter-item filter-charms" data-left-tab="charms">CHARMS</a>
+      </div>
+
+      <!-- Group 19: Right Filter (BOTTLE / CASES / LAPTOP / T-SHIRTS) -->
+      <div class="right-filter">
+        <button class="close-btn close-right" aria-label="Clear right filter">
+          <span class="close-line line-1"></span>
+          <span class="close-line line-2"></span>
+        </button>
+        <a href="#" class="filter-item filter-bottle">BOTTLE</a>
+        <a href="#" class="filter-item filter-cases active">CASES</a>
+        <a href="#" class="filter-item filter-laptop">LAPTOP</a>
+        <a href="#" class="filter-item filter-tshirts">T-SHIRTS</a>
+      </div>
+    </div>
+
+    <!-- Group 23: Main Content Area -->
+    <main class="inventory-content">
+      <!-- Left 2x3 Grid of Inventory Boxes -->
+      <div class="inventory-grid" id="inventoryGrid" data-active-category="stickers">
+        <!-- Box 1 (Top-Left: left 22px, top 162px) -->
+        <div class="inventory-box box-1" data-index="1" data-sticker-id="s1" data-charm-id="c1">
+          <img
+            src="../stickers/1%206.png"
+            alt="S_SpiderGuitar"
+            class="item-img sticker-img sticker-1"
+          />
+          <img
+            src="../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png"
+            alt="STAR_Charm"
+            class="item-img charm-img charm-1"
+          />
+        </div>
+
+        <!-- Box 2 (Top-Right: left 375px, top 162px) -->
+        <div class="inventory-box box-2" data-index="2" data-sticker-id="s2" data-charm-id="c2">
+          <img
+            src="../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png"
+            alt="S_SpiderPunk"
+            class="item-img sticker-img sticker-2"
+          />
+          <img
+            src="../charm/Screenshot%202026-11-04%20at%2010.20.53%E2%80%AFAM%203.png"
+            alt="C_RedDarumaCat"
+            class="item-img charm-img charm-2"
+          />
+        </div>
+
+        <!-- Box 3 (Middle-Left: left 22px, top 581px) -->
+        <div class="inventory-box box-3" data-index="3" data-sticker-id="s3" data-charm-id="c3">
+          <img
+            src="../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png"
+            alt="S_SpiderIDCard"
+            class="item-img sticker-img sticker-3"
+          />
+          <img
+            src="../charm/Screenshot%202026-11-04%20at%2010.21.14%E2%80%AFAM%203.png"
+            alt="C_WhiteLuckyCat"
+            class="item-img charm-img charm-3"
+          />
+        </div>
+
+        <!-- Box 4 (Middle-Right: left 375px, top 581px) -->
+        <div class="inventory-box box-4" data-index="4" data-sticker-id="s4" data-charm-id="c4">
+          <img
+            src="../stickers/Screenshot%202026-11-04%20at%2010.51.07%E2%80%AFAM%202.png"
+            alt="S_HobieIDCard"
+            class="item-img sticker-img sticker-4"
+          />
+          <img
+            src="../charm/Screenshot%202026-11-04%20at%2010.21.30%E2%80%AFAM%203.png"
+            alt="C_GoldLuckyCat"
+            class="item-img charm-img charm-4"
+          />
+        </div>
+
+        <!-- Box 5 (Bottom-Left: left 22px, top 1000px) -->
+        <div class="inventory-box box-5" data-index="5" data-sticker-id="s5">
+          <img
+            src="../stickers/Screenshot%202026-11-04%20at%2010.50.47%E2%80%AFAM%202.png"
+            alt="S_HobieNote"
+            class="item-img sticker-img sticker-5"
+          />
+        </div>
+
+        <!-- Box 6 (Bottom-Right: left 375px, top 1000px) -->
+        <div class="inventory-box box-6" data-index="6" data-sticker-id="s6">
+          <img
+            src="../stickers/Screenshot%202026-11-04%20at%2010.56.00%E2%80%AFAM%202.png"
+            alt="S_PunkLogo"
+            class="item-img sticker-img sticker-6"
+          />
+        </div>
+      </div>
+
+      <!-- Group 9: Right Preview & Controls -->
+      <div class="preview-section">
+        <!-- Frame 8: Preview Box -->
+        <div class="preview-frame" id="previewFrame">
+          <span class="preview-label">PREVIEW</span>
+
+          <!-- Overlapping iPhone 16 Case + Stickers + Charm -->
+          <div class="preview-case-stack visible" id="previewCaseStack">
+            <img src="../assets/case-red.png" alt="iPhone 16 Red Case" class="preview-case-img" data-case-color="red" />
+            <img src="../assets/case-blue.png" alt="iPhone 16 Blue Case" class="preview-case-img" data-case-color="blue" />
+            <img src="../assets/case-white.png" alt="iPhone 16 White Case" class="preview-case-img active" data-case-color="white" />
+            <img src="../assets/case-black.png" alt="iPhone 16 Black Case" class="preview-case-img" data-case-color="black" />
+
+            <!-- Stickers Surface Directly On Top of Case -->
+            <div class="case-sticker-surface" id="caseStickerSurface"></div>
+
+            <!-- Charm Layer Directly On Top at Right Side of Case -->
+            <div class="case-charm-layer" id="caseCharmLayer"></div>
+          </div>
+        </div>
+
+        <div class="ctl-device">
+        <!-- Filter & Device Controls below Preview -->
+        <button class="close-btn close-preview-filter" id="clearDeviceFilter" aria-label="Clear device filter">
+          <span class="close-line line-1"></span>
+          <span class="close-line line-2"></span>
+        </button>
+        <span class="label-filter">FILTER</span>
+
+        <span class="label-device">DEVICE</span>
+        <div class="device-list" id="deviceList">
+          <!-- IPHONE Group -->
+          <div class="device-brand open" data-brand="iphone">
+            <div class="device-item brand-title">IPHONE</div>
+            <div class="brand-models">
+              <div class="brand-models-inner">
+                <div class="device-item sub-device active" data-model="IPHONE 16">IPHONE 16</div>
+                <div class="device-item sub-device" data-model="IPHONE 16 PRO">IPHONE 16 PRO</div>
+                <div class="device-item sub-device" data-model="IPHONE 17">IPHONE 17</div>
+                <div class="device-item sub-device" data-model="IPHONE 17 PRO">IPHONE 17 PRO</div>
+                <div class="device-item sub-device" data-model="IPHONE 17 PRO MAX">IPHONE 17 PRO MAX</div>
+                <div class="device-spacer"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PIXEL Group -->
+          <div class="device-brand" data-brand="pixel">
+            <div class="device-item brand-title">PIXEL</div>
+            <div class="brand-models">
+              <div class="brand-models-inner">
+                <div class="device-item sub-device" data-model="PIXEL 9">PIXEL 9</div>
+                <div class="device-item sub-device" data-model="PIXEL 9 PRO">PIXEL 9 PRO</div>
+                <div class="device-spacer"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTHING Group -->
+          <div class="device-brand" data-brand="nothing">
+            <div class="device-item brand-title">NOTHING</div>
+            <div class="brand-models">
+              <div class="brand-models-inner">
+                <div class="device-item sub-device" data-model="PHONE (2)">PHONE (2)</div>
+                <div class="device-item sub-device" data-model="PHONE (2A)">PHONE (2A)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+        <div class="ctl-bg">
+        <span class="label-bg-color">BACKGROUND COLOR</span>
+        <button class="bg-swatch swatch-blue active" data-bg="#5DC6E8" aria-label="Blue background"></button>
+        <button class="bg-swatch swatch-white" data-bg="#FFFFFF" aria-label="White background"></button>
+        <button class="bg-swatch swatch-pink" data-bg="#FF9393" aria-label="Pink background"></button>
+        <button class="bg-swatch swatch-yellow" data-bg="#FFE079" aria-label="Yellow background"></button>
+
+        </div>
+
+        <!-- Model Color Row -->
+        <div class="model-color-section visible" id="modelColorSection">
+          <span class="label-color">COLOR</span>
+          <button class="device-color-swatch color-red" data-color="red" aria-label="Red"></button>
+          <button class="device-color-swatch color-blue" data-color="blue" aria-label="Blue"></button>
+          <button class="device-color-swatch color-white active" data-color="white" aria-label="White"></button>
+          <button class="device-color-swatch color-black" data-color="black" aria-label="Black"></button>
+        </div>
+
+        <!-- Receipt / Description & Price + Action Buttons -->
+        <div class="receipt-section" id="receiptSection">
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-header">
+            <span>DESCRIPTION</span>
+            <span>PRICE</span>
+          </div>
+
+          <div class="receipt-lines" id="receiptLines"></div>
+
+          <div class="receipt-actions">
+            <div class="share-preset-col">
+              <button type="button" class="action-btn btn-share-preset" id="sharePresetBtn">
+                <span class="btn-label-track">
+                  <span class="btn-label-row">SHARE TO PRESET</span>
+                  <span class="btn-label-row btn-label-shared">
+                    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 5.2L4.2 8.4L11 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/>
+                    </svg>
+                    <span>SHARED TO PRESET</span>
+                  </span>
+                </span>
+              </button>
+              <p class="share-preset-note">* Share your designed preset, you will receive a commission percentage on every copy sold of that preset.</p>
+            </div>
+            <button type="button" class="action-btn btn-proceed-buy is-locked" id="proceedBuyBtn" disabled aria-disabled="true">PROCEED TO BUY</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a></footer>
+  </div>
+
+  <script>
+    // Catalog definitions with distinct simultaneous positions on the 374x450 phone case back
+    const STICKER_DATA = {
+      s1: {
+        id: 's1',
+        name: 'S_SpiderGuitar',
+        price: 299.00,
+        src: '../stickers/1%206.png',
+        left: 140,
+        top: 132,
+        width: 152,
+        height: 152,
+        padL: 24,
+        padR: 21,
+        padT: 0,
+        padB: 4,
+        rotate: 0,
+        zIndex: 25
+      },
+      s2: {
+        id: 's2',
+        name: 'S_SpiderPunk',
+        price: 249.00,
+        src: '../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png',
+        left: 80,
+        top: 138,
+        width: 143,
+        height: 255,
+        padL: 27,
+        padR: 28,
+        padT: 11,
+        padB: 11,
+        rotate: 0,
+        zIndex: 24
+      },
+      s3: {
+        id: 's3',
+        name: 'S_SpiderIDCard',
+        price: 259.00,
+        src: '../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png',
+        left: 142.5,
+        top: 211.5,
+        width: 143,
+        height: 104,
+        padL: 0,
+        padR: 0,
+        padT: 0,
+        padB: 0,
+        rotate: 90,
+        zIndex: 22
+      },
+      s4: {
+        id: 's4',
+        name: 'S_HobieIDCard',
+        price: 259.00,
+        src: '../stickers/Screenshot%202026-11-04%20at%2010.51.07%E2%80%AFAM%202.png',
+        left: 98,
+        top: 290,
+        width: 170,
+        height: 126,
+        padL: 12,
+        padR: 12,
+        padT: 8,
+        padB: 18,
+        rotate: 0,
+        zIndex: 26
+      },
+      s5: {
+        id: 's5',
+        name: 'S_HobieNote',
+        price: 229.00,
+        src: '../stickers/Screenshot%202026-11-04%20at%2010.50.47%E2%80%AFAM%202.png',
+        left: 102,
+        top: 146,
+        width: 152,
+        height: 143,
+        padL: 10,
+        padR: 12,
+        padT: 2,
+        padB: 10,
+        rotate: 0,
+        zIndex: 27
+      },
+      s6: {
+        id: 's6',
+        name: 'S_PunkLogo',
+        price: 279.00,
+        src: '../stickers/Screenshot%202026-11-04%20at%2010.56.00%E2%80%AFAM%202.png',
+        left: 94,
+        top: 240,
+        width: 174,
+        height: 129,
+        padL: 15,
+        padR: 7,
+        padT: 0,
+        padB: 4,
+        rotate: 0,
+        zIndex: 28
+      }
+    };
+
+    const CHARM_DATA = {
+      c1: {
+        id: 'c1',
+        name: 'STAR_Charm',
+        price: 649.00,
+        src: '../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png',
+        left: 225,
+        top: 110,
+        width: 166,
+        height: 254,
+        rotate: 0,
+        loopTop: 126
+      },
+      c2: {
+        id: 'c2',
+        name: 'C_RedDarumaCat',
+        price: 599.00,
+        src: '../charm/Screenshot%202026-11-04%20at%2010.20.53%E2%80%AFAM%203.png',
+        left: 205,
+        top: 110,
+        width: 148,
+        height: 193,
+        rotate: 0,
+        loopTop: 120
+      },
+      c3: {
+        id: 'c3',
+        name: 'C_WhiteLuckyCat',
+        price: 599.00,
+        src: '../charm/Screenshot%202026-11-04%20at%2010.21.14%E2%80%AFAM%203.png',
+        left: 205,
+        top: 110,
+        width: 148,
+        height: 195,
+        rotate: 0,
+        loopTop: 120
+      },
+      c4: {
+        id: 'c4',
+        name: 'C_GoldLuckyCat',
+        price: 699.00,
+        src: '../charm/Screenshot%202026-11-04%20at%2010.21.30%E2%80%AFAM%203.png',
+        left: 205,
+        top: 110,
+        width: 148,
+        height: 176,
+        rotate: 0,
+        loopTop: 120
+      }
+    };
+
+    const CASE_COLOR_CODES = {
+      red: 'P_Cover1',
+      white: 'P_Cover2',
+      blue: 'P_Cover3',
+      black: 'P_Cover4'
+    };
+
+    const leftTabLinks = document.querySelectorAll('[data-left-tab]');
+    const clearLeftFilter = document.getElementById('clearLeftFilter');
+    const inventoryGrid = document.getElementById('inventoryGrid');
+    const inventoryBoxes = document.querySelectorAll('.inventory-box');
+    const deviceBrands = document.querySelectorAll('.device-brand');
+    const subDevices = document.querySelectorAll('.sub-device');
+    const modelColorSection = document.getElementById('modelColorSection');
+    const clearDeviceFilter = document.getElementById('clearDeviceFilter');
+    const bgSwatches = document.querySelectorAll('.bg-swatch');
+    const previewFrame = document.getElementById('previewFrame');
+    const previewCaseStack = document.getElementById('previewCaseStack');
+    const previewCaseImgs = document.querySelectorAll('.preview-case-img');
+    const caseStickerSurface = document.getElementById('caseStickerSurface');
+    const caseCharmLayer = document.getElementById('caseCharmLayer');
+    const deviceColorSwatches = document.querySelectorAll('.device-color-swatch');
+    const receiptLines = document.getElementById('receiptLines');
+    const sharePresetBtn = document.getElementById('sharePresetBtn');
+    const proceedBuyBtn = document.getElementById('proceedBuyBtn');
+    const navCart = document.getElementById('navCart');
+
+    // Cross-file state helper (syncs localStorage and window.name so Safari file:// navigation keeps data permanently)
+    try {
+      localStorage.removeItem('hotcatpics_presets');
+      if (window.name && window.name.startsWith('{')) {
+        const legacy = JSON.parse(window.name);
+        if (legacy && legacy.presets && !legacy.v2) {
+          delete legacy.presets;
+          legacy.v2 = true;
+          window.name = JSON.stringify(legacy);
+        }
+      }
+    } catch (e) {}
+
+    function loadStore() {
+      let store = { v2: true };
+      try {
+        if (window.name && window.name.startsWith('{')) {
+          store = { ...store, ...JSON.parse(window.name) };
+        }
+      } catch (e) {
+        store = { v2: true };
+      }
+      try {
+        const lsPresets = localStorage.getItem('hotcatpics_presets_v2');
+        if (lsPresets) {
+          store.presets = JSON.parse(lsPresets);
+        }
+        const lsCart = localStorage.getItem('hotcatpics_cart_count');
+        if (lsCart !== null && store.cartCount === undefined) {
+          store.cartCount = parseInt(lsCart, 10) || 0;
+        }
+        const lsWish = localStorage.getItem('hotcatpics_wishlist');
+        if (lsWish) {
+          store.wishlist = JSON.parse(lsWish);
+        }
+      } catch (e) {}
+      return store;
+    }
+
+    function saveStore(updates) {
+      const store = { ...loadStore(), ...updates, v2: true };
+      try {
+        window.name = JSON.stringify(store);
+      } catch (e) {}
+      try {
+        if (store.presets !== undefined) {
+          localStorage.setItem('hotcatpics_presets_v2', JSON.stringify(store.presets));
+        }
+        if (store.cartCount !== undefined) {
+          localStorage.setItem('hotcatpics_cart_count', String(store.cartCount));
+        }
+        if (store.wishlist !== undefined) {
+          localStorage.setItem('hotcatpics_wishlist', JSON.stringify(store.wishlist));
+        }
+        if (store.currentOrder !== undefined) {
+          localStorage.setItem('hotcatpics_current_order', JSON.stringify(store.currentOrder));
+        }
+      } catch (e) {}
+    }
+
+    // State
+    let activeTab = 'stickers';
+    let selectedModel = 'IPHONE 16';
+    let selectedCaseColor = 'white';
+    let selectedBgColor = '#5DC6E8';
+    const selectedStickers = new Map();
+    let selectedCharmId = null;
+    let topZCounter = 30;
+    const initialStore = loadStore();
+    let cartCount = initialStore.cartCount || 0;
+    navCart.textContent = `CART ${cartCount}`;
+    const navWishlist = document.getElementById('navWishlist');
+    const wishCount = Array.isArray(initialStore.wishlist) ? initialStore.wishlist.length : 0;
+    if (navWishlist) navWishlist.textContent = `WISHLIST ${wishCount}`;
+
+    function ensureCaseVisible() {
+      if (!selectedModel) {
+        const iphoneBrand = document.querySelector('.device-brand[data-brand="iphone"]');
+        const iphone16El = document.querySelector('.sub-device[data-model="IPHONE 16"]');
+        if (iphoneBrand && iphone16El) {
+          deviceBrands.forEach((b) => b.classList.remove('open'));
+          iphoneBrand.classList.add('open');
+          subDevices.forEach((m) => m.classList.remove('active'));
+          iphone16El.classList.add('active');
+          selectedModel = 'IPHONE 16';
+        }
+      }
+      modelColorSection.classList.add('visible');
+      previewCaseStack.classList.add('visible');
+    }
+
+    function syncBoxHighlights() {
+      inventoryBoxes.forEach((box) => {
+        if (activeTab === 'stickers') {
+          const sId = box.dataset.stickerId;
+          box.classList.toggle('selected', Boolean(sId && selectedStickers.has(sId)));
+        } else {
+          const cId = box.dataset.charmId;
+          box.classList.toggle('selected', Boolean(cId && selectedCharmId === cId));
+        }
+      });
+    }
+
+    function renderPreviewStickers() {
+      caseStickerSurface.innerHTML = '';
+      selectedStickers.forEach((sticker) => {
+        const img = document.createElement('img');
+        img.src = sticker.src;
+        img.alt = sticker.name;
+        img.className = 'placed-sticker';
+        img.style.position = 'absolute';
+        img.style.display = 'block';
+        img.style.opacity = '1';
+        img.style.visibility = 'visible';
+        img.style.left = `${sticker.left}px`;
+        img.style.top = `${sticker.top}px`;
+        img.style.width = `${sticker.width}px`;
+        img.style.height = `${sticker.height}px`;
+        img.style.zIndex = String(sticker.zIndex || 25);
+        img.style.transform = sticker.rotate ? `rotate(${sticker.rotate}deg)` : 'none';
+
+        makeStickerDraggable(img, sticker);
+        caseStickerSurface.appendChild(img);
+      });
+    }
+
+    // Usable areas on the 374x450 case: main back (x 90..276, y 130..412) and the
+    // narrow strip beside the camera bump (x 190..277, y 30..412). Stickers that are
+    // dragged into the strip shrink to fit and grow back when dragged out.
+    const CASE_AREA = { minX: 90, maxX: 276, minY: 130, maxY: 412 };
+    const STRIP_AREA = { minX: 190, maxX: 274, minY: 48, maxY: 410 };
+
+    function makeStickerDraggable(el, stickerObj) {
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startCx = 0;
+      let startCy = 0;
+      let dragScale = 1;
+
+      if (!stickerObj.base) {
+        const rot = Math.abs(stickerObj.rotate) === 90;
+        stickerObj.base = {
+          width: stickerObj.width,
+          height: stickerObj.height,
+          padL: rot ? 0 : (stickerObj.padL || 0),
+          padR: rot ? 0 : (stickerObj.padR || 0),
+          padT: rot ? 0 : (stickerObj.padT || 0),
+          padB: rot ? 0 : (stickerObj.padB || 0),
+          rot
+        };
+        stickerObj.scale = 1;
+      }
+      const B = stickerObj.base;
+      // visible-box centre offset inside the element, and visible size, in base units
+      const ox = B.padL + (B.width - B.padL - B.padR) / 2;
+      const oy = B.padT + (B.height - B.padT - B.padB) / 2;
+      const visW = B.rot ? B.height : (B.width - B.padL - B.padR);
+      const visH = B.rot ? B.width : (B.height - B.padT - B.padB);
+
+      el.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        dragScale = (caseStickerSurface.getBoundingClientRect().width / 374) || 1;
+        const sc = stickerObj.scale || 1;
+        startCx = stickerObj.left + ox * sc;
+        startCy = stickerObj.top + oy * sc;
+        topZCounter += 1;
+        stickerObj.zIndex = topZCounter;
+        el.style.zIndex = String(topZCounter);
+        el.setPointerCapture(e.pointerId);
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const cx = startCx + (e.clientX - startX) / dragScale;
+        const cy = startCy + (e.clientY - startY) / dragScale;
+
+        // Decide whether the sticker is being pushed up beside the camera
+        const wantsStrip = cx >= 185 && (cy - visH / 2) < 126;
+        let sc = 1;
+        let area = CASE_AREA;
+        if (wantsStrip) {
+          area = STRIP_AREA;
+          const stripW = STRIP_AREA.maxX - STRIP_AREA.minX;
+          sc = Math.min(1, stripW / visW);
+        }
+
+        const w = visW * sc;
+        const h = visH * sc;
+        const clampedCx = Math.max(area.minX + w / 2, Math.min(area.maxX - w / 2, cx));
+        const clampedCy = Math.max(area.minY + h / 2, Math.min(area.maxY - h / 2, cy));
+
+        stickerObj.scale = sc;
+        stickerObj.width = B.width * sc;
+        stickerObj.height = B.height * sc;
+        stickerObj.padL = B.padL * sc;
+        stickerObj.padR = B.padR * sc;
+        stickerObj.padT = B.padT * sc;
+        stickerObj.padB = B.padB * sc;
+        stickerObj.left = Math.round((clampedCx - ox * sc) * 10) / 10;
+        stickerObj.top = Math.round((clampedCy - oy * sc) * 10) / 10;
+
+        el.style.width = `${stickerObj.width}px`;
+        el.style.height = `${stickerObj.height}px`;
+        el.style.left = `${stickerObj.left}px`;
+        el.style.top = `${stickerObj.top}px`;
+      });
+
+      el.addEventListener('pointerup', () => {
+        isDragging = false;
+      });
+    }
+
+    function renderPreviewCharm() {
+      caseCharmLayer.innerHTML = '';
+      if (!selectedCharmId || !CHARM_DATA[selectedCharmId]) return;
+      const charm = CHARM_DATA[selectedCharmId];
+
+      const loopEl = document.createElement('div');
+      loopEl.className = 'case-charm-loop';
+      loopEl.style.top = `${charm.loopTop}px`;
+
+      const img = document.createElement('img');
+      img.src = charm.src;
+      img.alt = charm.name;
+      img.className = 'placed-charm';
+      img.style.position = 'absolute';
+      img.style.display = 'block';
+      img.style.opacity = '1';
+      img.style.visibility = 'visible';
+      img.style.left = `${charm.left}px`;
+      img.style.top = `${charm.top}px`;
+      img.style.width = `${charm.width}px`;
+      img.style.height = `${charm.height}px`;
+      if (charm.rotate) {
+        img.style.transform = `rotate(${charm.rotate}deg)`;
+      }
+
+      caseCharmLayer.appendChild(img);
+      caseCharmLayer.appendChild(loopEl);
+    }
+
+    const TRASH_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 10v6M14 10v6"/></svg>';
+
+    function createReceiptRow(label, priceNum, onRemove) {
+      const row = document.createElement('div');
+      row.className = 'receipt-row';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'receipt-item-name';
+      nameSpan.textContent = label;
+
+      const leaderSpan = document.createElement('span');
+      leaderSpan.className = 'receipt-item-leader';
+
+      const priceSpan = document.createElement('span');
+      priceSpan.className = 'receipt-item-price';
+      priceSpan.textContent = `₹${priceNum.toFixed(2)}`;
+
+      row.appendChild(nameSpan);
+      row.appendChild(leaderSpan);
+      row.appendChild(priceSpan);
+
+      if (onRemove) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'receipt-remove-btn';
+        delBtn.title = `Remove ${label}`;
+        delBtn.setAttribute('aria-label', `Remove ${label}`);
+        delBtn.innerHTML = TRASH_SVG;
+        delBtn.addEventListener('click', onRemove);
+        row.appendChild(delBtn);
+      }
+      return row;
+    }
+
+    function renderReceipt() {
+      receiptLines.innerHTML = '';
+
+      selectedStickers.forEach((sticker) => {
+        receiptLines.appendChild(createReceiptRow(sticker.name, sticker.price, () => {
+          selectedStickers.delete(sticker.id);
+          sharePresetBtn.classList.remove('is-shared');
+          syncBoxHighlights();
+          renderPreviewStickers();
+          renderReceipt();
+        }));
+      });
+
+      if (selectedCharmId && CHARM_DATA[selectedCharmId]) {
+        const charm = CHARM_DATA[selectedCharmId];
+        receiptLines.appendChild(createReceiptRow(charm.name, charm.price, () => {
+          selectedCharmId = null;
+          sharePresetBtn.classList.remove('is-shared');
+          syncBoxHighlights();
+          renderPreviewCharm();
+          renderReceipt();
+        }));
+      }
+
+      if (selectedModel) {
+        const formattedModel = selectedModel === 'IPHONE 16'
+          ? 'IPhone 16'
+          : selectedModel;
+        const coverCode = CASE_COLOR_CODES[selectedCaseColor] || 'P_Cover2';
+        receiptLines.appendChild(createReceiptRow(`${formattedModel}: ${coverCode}`, 2499.00));
+      }
+    }
+
+    leftTabLinks.forEach((tabLink) => {
+      tabLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        leftTabLinks.forEach((link) => link.classList.remove('active'));
+        tabLink.classList.add('active');
+        activeTab = tabLink.dataset.leftTab;
+        inventoryGrid.dataset.activeCategory = activeTab;
+        syncBoxHighlights();
+      });
+    });
+
+    clearLeftFilter.addEventListener('click', () => {
+      selectedStickers.clear();
+      selectedCharmId = null;
+      sharePresetBtn.classList.remove('is-shared');
+      syncBoxHighlights();
+      renderPreviewStickers();
+      renderPreviewCharm();
+      renderReceipt();
+    });
+
+    // Click on an inventory box -> immediately appears on the preview phone case simultaneously
+    inventoryBoxes.forEach((box) => {
+      box.addEventListener('click', () => {
+        ensureCaseVisible();
+        sharePresetBtn.classList.remove('is-shared');
+
+        if (activeTab === 'stickers') {
+          const sId = box.dataset.stickerId;
+          if (!sId || !STICKER_DATA[sId]) return;
+
+          if (selectedStickers.has(sId)) {
+            selectedStickers.delete(sId);
+          } else {
+            topZCounter += 1;
+            selectedStickers.set(sId, { ...STICKER_DATA[sId], zIndex: topZCounter });
+          }
+          syncBoxHighlights();
+          renderPreviewStickers();
+          renderReceipt();
+        } else if (activeTab === 'charms') {
+          const cId = box.dataset.charmId;
+          if (!cId || !CHARM_DATA[cId]) return;
+
+          selectedCharmId = selectedCharmId === cId ? null : cId;
+          syncBoxHighlights();
+          renderPreviewCharm();
+          renderReceipt();
+        }
+      });
+    });
+
+    deviceBrands.forEach((brandEl) => {
+      const titleEl = brandEl.querySelector('.brand-title');
+      titleEl.addEventListener('click', () => {
+        const isAlreadyOpen = brandEl.classList.contains('open');
+
+        deviceBrands.forEach((b) => b.classList.remove('open'));
+        subDevices.forEach((m) => m.classList.remove('active'));
+        modelColorSection.classList.remove('visible');
+        previewCaseStack.classList.remove('visible');
+        selectedModel = null;
+
+        if (!isAlreadyOpen) {
+          brandEl.classList.add('open');
+        }
+        renderReceipt();
+      });
+    });
+
+    subDevices.forEach((modelEl) => {
+      modelEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        subDevices.forEach((m) => m.classList.remove('active'));
+        modelEl.classList.add('active');
+        selectedModel = modelEl.dataset.model;
+        modelColorSection.classList.add('visible');
+        previewCaseStack.classList.add('visible');
+        renderReceipt();
+      });
+    });
+
+    clearDeviceFilter.addEventListener('click', () => {
+      deviceBrands.forEach((b) => b.classList.remove('open'));
+      subDevices.forEach((m) => m.classList.remove('active'));
+      modelColorSection.classList.remove('visible');
+      previewCaseStack.classList.remove('visible');
+      selectedModel = null;
+      renderReceipt();
+    });
+
+    bgSwatches.forEach((swatch) => {
+      swatch.addEventListener('click', () => {
+        bgSwatches.forEach((s) => s.classList.remove('active'));
+        swatch.classList.add('active');
+        selectedBgColor = swatch.dataset.bg;
+        previewFrame.style.backgroundColor = selectedBgColor;
+        sharePresetBtn.classList.remove('is-shared');
+      });
+    });
+
+    deviceColorSwatches.forEach((swatch) => {
+      swatch.addEventListener('click', () => {
+        deviceColorSwatches.forEach((s) => s.classList.remove('active'));
+        swatch.classList.add('active');
+
+        selectedCaseColor = swatch.dataset.color;
+        previewCaseImgs.forEach((img) => {
+          img.classList.toggle('active', img.dataset.caseColor === selectedCaseColor);
+        });
+        sharePresetBtn.classList.remove('is-shared');
+        renderReceipt();
+      });
+    });
+
+    sharePresetBtn.addEventListener('click', () => {
+      ensureCaseVisible();
+      if (sharePresetBtn.classList.contains('is-shared')) return;
+
+      const presetItem = {
+        id: 'preset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        model: selectedModel || 'IPHONE 16',
+        caseColor: selectedCaseColor,
+        bgColor: selectedBgColor,
+        stickers: Array.from(selectedStickers.values()),
+        charm: selectedCharmId ? CHARM_DATA[selectedCharmId] : null,
+        orders: 0,
+        createdAt: Date.now()
+      };
+
+      const store = loadStore();
+      const existing = Array.isArray(store.presets) ? store.presets : [];
+      existing.push(presetItem);
+      saveStore({ presets: existing });
+
+      // Sync to shared cloud preset stream so everyone opening the link sees it
+      fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {
+        method: 'POST',
+        keepalive: true,
+        body: JSON.stringify({ action: 'share', preset: presetItem })
+      }).catch(() => {});
+
+      // Permanent UI transition
+      sharePresetBtn.classList.add('is-shared');
+    });
+
+    // PROCEED TO BUY is currently locked/unclickable until unlocked
+    proceedBuyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (proceedBuyBtn.disabled || proceedBuyBtn.classList.contains('is-locked')) return;
+    });
+
+    // Initial receipt render
+    renderReceipt();
+  </script>
+</body>
+</html>

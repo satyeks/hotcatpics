@@ -330,7 +330,7 @@
       if (Array.isArray(preset.stickers)) {
         preset.stickers.forEach((sticker) => {
           const sImg = document.createElement('img');
-          sImg.src = sticker.src;
+          sImg.src = sticker.src.replace(/^\.\.\//, '');
           sImg.alt = sticker.name || 'Sticker';
           sImg.className = 'detail-placed-sticker';
           sImg.style.left = `${sticker.left}px`;
@@ -348,7 +348,7 @@
       detailCharmLayer.innerHTML = '';
       if (preset.charm) {
         const cImg = document.createElement('img');
-        cImg.src = preset.charm.src;
+        cImg.src = preset.charm.src.replace(/^\.\.\//, '');
         cImg.alt = preset.charm.name || 'Charm';
         cImg.className = 'detail-placed-charm';
         cImg.style.left = `${preset.charm.left}px`;
@@ -511,7 +511,7 @@
         if (Array.isArray(preset.stickers)) {
           preset.stickers.forEach((sticker) => {
             const sImg = document.createElement('img');
-            sImg.src = sticker.src;
+            sImg.src = sticker.src.replace(/^\.\.\//, '');
             sImg.alt = sticker.name || 'Sticker';
             sImg.className = 'preset-placed-sticker';
             sImg.style.left = `${sticker.left}px`;
@@ -532,7 +532,7 @@
           charmLayer.className = 'preset-charm-layer';
 
           const cImg = document.createElement('img');
-          cImg.src = preset.charm.src;
+          cImg.src = preset.charm.src.replace(/^\.\.\//, '');
           cImg.alt = preset.charm.name || 'Charm';
           cImg.className = 'preset-placed-charm';
           cImg.style.left = `${preset.charm.left}px`;
