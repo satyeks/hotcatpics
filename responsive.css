@@ -1,0 +1,331 @@
+/* ==========================================================
+   HOTCATPICS responsive layer (loaded after each page's CSS)
+   - 1470px+      : original pixel-perfect desktop canvas (centered)
+   - 821-1469px   : whole canvas scales down to fit the viewport
+   - <= 820px     : real mobile layout (stacked, touch friendly)
+   Scale factors (--page-zoom, --pv-zoom, ...) come from responsive.js
+   ========================================================== */
+
+.mobile-back-btn { display: none; }
+
+@media (min-width: 821px) and (max-width: 1469px) {
+  .landing-page,
+  .inventory-page,
+  .checkout-page {
+    zoom: var(--page-zoom, 1);
+  }
+}
+
+@media (max-width: 820px) {
+  html, body { overflow-x: hidden; }
+
+  /* ---------- Shared page shells ---------- */
+  .landing-page,
+  .inventory-page,
+  .checkout-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 100vh !important;
+    margin: 0;
+    padding-bottom: 24px;
+  }
+
+  /* ---------- Shared header ---------- */
+  .header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 0;
+  }
+  .logo {
+    position: static;
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .header-right {
+    display: flex;
+    gap: 16px;
+    order: 2;
+  }
+  .main-nav {
+    display: flex;
+    gap: 22px;
+    order: 3;
+    width: 100%;
+    margin-top: 14px;
+  }
+  .nav-item {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+    padding: 4px 0;
+  }
+  .nav-presets.active::after,
+  .nav-inventory.active::after {
+    width: 100%;
+    left: 0;
+    top: auto;
+    bottom: 0;
+  }
+
+  /* ---------- Shared close icon / filter rows ---------- */
+  .close-btn {
+    position: relative;
+    left: auto;
+    top: auto;
+    flex-shrink: 0;
+  }
+  .filter-item {
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+  }
+
+  /* ---------- Shared footer ---------- */
+  .site-footer {
+    position: static;
+    left: auto;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    margin: 56px auto 12px;
+    text-align: center;
+    order: 99;
+  }
+
+  /* ================= LANDING (index.html) ================= */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 16px 14px;
+  }
+  .filter-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+  .grid-container {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: center;
+    gap: 10px;
+    padding: 0 16px 24px;
+  }
+  .block {
+    zoom: var(--block-zoom, 0.5);
+  }
+  .preset-remove-btn { opacity: 1; }
+
+  .landing-page.split-view .filter-bar,
+  .landing-page.split-view .grid-container {
+    display: none;
+  }
+  .preset-detail-panel {
+    display: none;
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+    padding: 0 16px;
+    transform: none;
+  }
+  .landing-page.split-view .preset-detail-panel {
+    display: block;
+    transform: none;
+  }
+  .landing-page.split-view .mobile-back-btn {
+    display: block;
+    align-self: flex-start;
+    margin: 18px 16px 14px;
+    padding: 6px 0;
+    background: transparent;
+    border: none;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 14px;
+    color: #000000;
+    cursor: pointer;
+  }
+  .detail-preview-box {
+    zoom: var(--detail-zoom, 0.6);
+    margin: 0 auto 16px;
+  }
+  .detail-price-row {
+    width: 100%;
+    margin-bottom: 22px;
+  }
+  .detail-actions {
+    width: 100%;
+    gap: 12px;
+  }
+  .detail-btn {
+    flex: 1;
+    width: auto;
+    height: 46px;
+  }
+
+  /* ================= INVENTORY (inventory.html) ================= */
+  .sub-nav,
+  .inventory-content {
+    display: contents;
+  }
+  .left-filter,
+  .right-filter {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 16px 12px;
+  }
+  .left-filter { order: 1; }
+  .inventory-grid {
+    order: 2;
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: center;
+    gap: 10px;
+    padding: 0 16px;
+  }
+  .right-filter {
+    order: 3;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .preview-section {
+    order: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 0 16px;
+  }
+  .inventory-box {
+    position: relative;
+    left: auto;
+    top: auto;
+    zoom: var(--box-zoom, 0.5);
+  }
+  .inventory-grid[data-active-category="charms"] .box-5,
+  .inventory-grid[data-active-category="charms"] .box-6 {
+    display: none;
+  }
+
+  .preview-frame {
+    position: relative;
+    left: auto;
+    top: auto;
+    align-self: center;
+    zoom: var(--pv-zoom, 0.6);
+  }
+
+  .ctl-device {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 14px;
+  }
+  .close-preview-filter { margin-top: 3px; }
+  .label-filter,
+  .label-device,
+  .label-bg-color,
+  .label-color {
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+  }
+  .device-list {
+    position: static;
+    left: auto;
+    top: auto;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .ctl-bg,
+  .model-color-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .bg-swatch,
+  .device-color-swatch {
+    position: static;
+    left: auto;
+    top: auto;
+    flex-shrink: 0;
+  }
+  .bg-swatch { width: 20px; height: 20px; }
+  .device-color-swatch { width: 18px; height: 18px; }
+
+  .receipt-section {
+    position: static;
+    left: auto;
+    top: auto;
+    width: 100%;
+  }
+  .receipt-divider,
+  .receipt-actions { width: 100%; }
+  .receipt-actions { gap: 12px; align-items: flex-start; }
+  .share-preset-col { width: calc(50% - 6px); }
+  .receipt-actions .action-btn { width: 100%; }
+  .btn-proceed-buy { width: calc(50% - 6px) !important; }
+  .receipt-remove-btn { left: -20px; }
+  .receipt-section { padding-left: 20px; }
+  .receipt-divider { margin-left: -20px; width: calc(100% + 20px); }
+
+  /* ================= CHECKOUT (checkout.html) ================= */
+  .checkout-right {
+    order: 1;
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+    padding: 28px 16px 0;
+  }
+  .checkout-left {
+    order: 2;
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+    padding: 28px 16px 0;
+  }
+  .summary-preview-frame {
+    zoom: var(--sum-zoom, 0.6);
+    margin: 0 auto;
+  }
+  .summary-receipt,
+  .payment-card-selector,
+  .secure-banner,
+  .submit-order-btn {
+    width: 100%;
+  }
+  .summary-receipt .receipt-item-name {
+    white-space: normal;
+  }
+  .summary-receipt .receipt-item-leader {
+    flex: 1 0 12px;
+  }
+  .summary-receipt .receipt-item-price {
+    flex-shrink: 0;
+  }
+  .field-input,
+  .field-select {
+    font-size: 16px; /* prevents iOS zoom-on-focus */
+  }
+}

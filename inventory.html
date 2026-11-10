@@ -122,6 +122,8 @@
       color: #555555;
     }
   </style>
+  <link rel="stylesheet" href="responsive.css?v=1" />
+  <script src="responsive.js"></script>
 </head>
 <body>
   <div class="inventory-page">
@@ -266,6 +268,7 @@
           </div>
         </div>
 
+        <div class="ctl-device">
         <!-- Filter & Device Controls below Preview -->
         <button class="close-btn close-preview-filter" id="clearDeviceFilter" aria-label="Clear device filter">
           <span class="close-line line-1"></span>
@@ -314,11 +317,16 @@
           </div>
         </div>
 
+        </div>
+
+        <div class="ctl-bg">
         <span class="label-bg-color">BACKGROUND COLOR</span>
         <button class="bg-swatch swatch-blue active" data-bg="#5DC6E8" aria-label="Blue background"></button>
         <button class="bg-swatch swatch-white" data-bg="#FFFFFF" aria-label="White background"></button>
         <button class="bg-swatch swatch-pink" data-bg="#FF9393" aria-label="Pink background"></button>
         <button class="bg-swatch swatch-yellow" data-bg="#FFE079" aria-label="Yellow background"></button>
+
+        </div>
 
         <!-- Model Color Row -->
         <div class="model-color-section visible" id="modelColorSection">
@@ -670,6 +678,7 @@
       let startY = 0;
       let startCx = 0;
       let startCy = 0;
+      let dragScale = 1;
 
       if (!stickerObj.base) {
         const rot = Math.abs(stickerObj.rotate) === 90;
@@ -697,6 +706,7 @@
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
+        dragScale = (caseStickerSurface.getBoundingClientRect().width / 374) || 1;
         const sc = stickerObj.scale || 1;
         startCx = stickerObj.left + ox * sc;
         startCy = stickerObj.top + oy * sc;
@@ -708,8 +718,8 @@
 
       el.addEventListener('pointermove', (e) => {
         if (!isDragging) return;
-        const cx = startCx + (e.clientX - startX);
-        const cy = startCy + (e.clientY - startY);
+        const cx = startCx + (e.clientX - startX) / dragScale;
+        const cy = startCy + (e.clientY - startY) / dragScale;
 
         // Decide whether the sticker is being pushed up beside the camera
         const wantsStrip = cx >= 185 && (cy - visH / 2) < 126;

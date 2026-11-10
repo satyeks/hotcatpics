@@ -47,6 +47,8 @@
     .preset-charm-layer,
     .detail-charm-layer { z-index: 30 !important; }
   </style>
+  <link rel="stylesheet" href="responsive.css?v=1" />
+  <script src="responsive.js"></script>
 </head>
 <body>
   <div class="landing-page" id="landingPage">
@@ -84,6 +86,7 @@
     <main class="grid-container" id="presetsGrid"></main>
 
     <!-- Right-Side Expanded Preset View (Shown when a preset block is clicked) -->
+    <button type="button" class="mobile-back-btn" id="mobileBackBtn">‹ BACK TO PRESETS</button>
     <aside class="preset-detail-panel" id="presetDetailPanel">
       <div class="detail-preview-box" id="detailPreviewBox">
         <div class="detail-case-stage" id="detailCaseStage">
@@ -281,6 +284,7 @@
       detailPriceValue.textContent = `₹${accumulatedPrice.toFixed(2)}`;
 
       landingPage.classList.add('split-view');
+      if (window.innerWidth <= 820) window.scrollTo(0, 0);
       updateCanvasHeight();
     }
 
@@ -299,6 +303,8 @@
         closePresetDetail();
       }
     });
+
+    document.getElementById('mobileBackBtn').addEventListener('click', closePresetDetail);
 
     if (clearPresetsBtn) {
       clearPresetsBtn.addEventListener('click', () => {
