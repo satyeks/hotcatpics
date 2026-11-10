@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="checkout.css?v=9" />
+  <link rel="stylesheet" href="checkout.css?v=10" />
   <style>
     /* Clip stickers to the rounded case body so edges never spill past the corners */
     .case-sticker-surface,
@@ -250,9 +250,9 @@
         <!-- Calculated Delivery Charges Row -->
         <div class="summary-delivery-section">
           <div class="receipt-row delivery-row">
-            <span class="receipt-item-name" id="deliveryLabel">Delivery Charges (Standard - INDIA)</span>
+            <span class="receipt-item-name" id="deliveryLabel">Delivery Charges (enter address)</span>
             <span class="receipt-item-leader"></span>
-            <span class="receipt-item-price" id="deliveryPrice">₹3.50</span>
+            <span class="receipt-item-price" id="deliveryPrice">--</span>
           </div>
         </div>
 
@@ -354,6 +354,9 @@
     const deliveryPriceEl = document.getElementById('deliveryPrice');
     const totalPriceEl = document.getElementById('totalPrice');
 
+    const emailInput = document.getElementById('emailInput');
+    const addressInput = document.getElementById('addressInput');
+    const aptInput = document.getElementById('aptInput');
     const cityInput = document.getElementById('cityInput');
     const stateInput = document.getElementById('stateInput');
     const zipInput = document.getElementById('zipInput');
@@ -458,37 +461,68 @@
       }
     }
 
-    // Dynamically calculate delivery charges based on Country, State/Province, City, and PIN/ZIP code
+    // ---- Delivery charge engine (all amounts in INR, excl. items) ----
+    const DELIVERY_RATES = {
+      metro: 149.00,     // major metro cities
+      standard: 199.00,  // rest of India
+      remote: 249.00,    // North-East, J&K / Ladakh, islands, Sikkim
+      intlNear: 799.00,  // neighbouring / nearby countries
+      intlFar: 1199.00   // rest of the world
+    };
+
+    const METRO_PIN3 = ['110', '400', '401', '410', '411', '560', '600', '500', '700', '380', '122', '201'];
+    const REMOTE_PIN_PREFIXES = ['78', '79', '18', '19', '737', '744', '796', '797', '798', '799'];
+    const METRO_CITIES = ['DELHI', 'NEW DELHI', 'MUMBAI', 'PUNE', 'BENGALURU', 'BANGALORE', 'CHENNAI', 'HYDERABAD', 'KOLKATA', 'AHMEDABAD', 'GURGAON', 'GURUGRAM', 'NOIDA'];
+    const REMOTE_STATES = ['ASSAM', 'ARUNACHAL PRADESH', 'MANIPUR', 'MEGHALAYA', 'MIZORAM', 'NAGALAND', 'TRIPURA', 'SIKKIM', 'JAMMU AND KASHMIR', 'JAMMU & KASHMIR', 'LADAKH', 'ANDAMAN AND NICOBAR ISLANDS', 'ANDAMAN & NICOBAR', 'LAKSHADWEEP'];
+    const NEAR_COUNTRIES = ['NEPAL', 'BHUTAN', 'SRI LANKA', 'BANGLADESH', 'MALDIVES', 'SINGAPORE', 'UAE', 'UNITED ARAB EMIRATES', 'THAILAND', 'MALAYSIA', 'INDONESIA', 'PAKISTAN', 'MYANMAR', 'OMAN', 'QATAR', 'SAUDI ARABIA', 'KUWAIT', 'BAHRAIN'];
+
+    let currentDelivery = { charge: 0, label: 'Enter address to calculate', ready: false };
+
     function calculateDeliveryCharges() {
-      const country = (countryInput.value || '').trim().toUpperCase();
+      const rawCountry = (countryInput.value || '').trim().toUpperCase();
+      const country = rawCountry === 'IN' || rawCountry === '' ? 'INDIA' : rawCountry;
       const state = (stateInput.value || '').trim().toUpperCase();
       const city = (cityInput.value || '').trim().toUpperCase();
-      const zip = (zipInput.value || '').trim();
+      const zip = (zipInput.value || '').replace(/\s/g, '');
 
-      let charge = 199.00;
-      let zoneText = 'Standard';
+      let charge = 0;
+      let zoneText = '';
+      let ready = true;
 
-      if (country && country !== 'INDIA' && country !== 'IN') {
-        charge = 999.00;
-        zoneText = `Intl - ${country}`;
-      } else if (/^(11|40|56|60|50|70)/.test(zip) || ['DELHI', 'MUMBAI', 'BENGALURU', 'BANGALORE', 'CHENNAI', 'HYDERABAD', 'KOLKATA', 'PUNE'].includes(city)) {
-        charge = 149.00;
-        zoneText = city ? `Metro - ${city}` : 'Metro Zone';
-      } else if (/^[789]/.test(zip)) {
-        charge = 249.00;
-        zoneText = state ? `Zone B - ${state}` : 'Zone B';
-      } else if (zip.length >= 3 || state || city) {
-        charge = 199.00;
-        zoneText = state || city || 'INDIA';
+      if (country !== 'INDIA') {
+        const near = NEAR_COUNTRIES.includes(country);
+        charge = near ? DELIVERY_RATES.intlNear : DELIVERY_RATES.intlFar;
+        zoneText = `International - ${country}`;
       } else {
-        charge = 199.00;
-        zoneText = country || 'INDIA';
+        const pinValid = /^[1-9][0-9]{5}$/.test(zip);
+        if (pinValid && (REMOTE_PIN_PREFIXES.some((p) => zip.startsWith(p)))) {
+          charge = DELIVERY_RATES.remote;
+          zoneText = `Remote - ${state || zip}`;
+        } else if ((pinValid && METRO_PIN3.includes(zip.slice(0, 3))) || METRO_CITIES.includes(city)) {
+          charge = DELIVERY_RATES.metro;
+          zoneText = `Metro - ${city || zip}`;
+        } else if (REMOTE_STATES.includes(state)) {
+          charge = DELIVERY_RATES.remote;
+          zoneText = `Remote - ${state}`;
+        } else if (pinValid || state || city) {
+          charge = DELIVERY_RATES.standard;
+          zoneText = `Standard - ${state || city || zip}`;
+        } else {
+          ready = false;
+        }
       }
 
-      deliveryLabel.textContent = `Delivery Charges (${zoneText})`;
-      deliveryPriceEl.textContent = `₹${charge.toFixed(2)}`;
+      if (ready) {
+        currentDelivery = { charge, label: `Delivery Charges (${zoneText})`, ready: true };
+        deliveryLabel.textContent = currentDelivery.label;
+        deliveryPriceEl.textContent = `₹${charge.toFixed(2)}`;
+      } else {
+        currentDelivery = { charge: 0, label: 'Enter address to calculate', ready: false };
+        deliveryLabel.textContent = 'Delivery Charges (enter address)';
+        deliveryPriceEl.textContent = '--';
+      }
 
-      const grandTotal = itemsSubtotal + charge;
+      const grandTotal = itemsSubtotal + currentDelivery.charge;
       totalPriceEl.textContent = `₹${grandTotal.toFixed(2)}`;
     }
 
@@ -503,15 +537,57 @@
       e.target.value = groups ? groups.join(' ') : '';
     });
 
-    // Submit order handler
+    // Submit order handler: validates the address, then stores the final order with delivery + total
     checkoutForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      submitOrderBtn.textContent = 'ORDER SUBMITTED ✓';
+      calculateDeliveryCharges();
+
+      const countryUp = (countryInput.value || '').trim().toUpperCase();
+      const isIndia = countryUp === '' || countryUp === 'INDIA' || countryUp === 'IN';
+      const required = [emailInput, addressInput, cityInput, stateInput, zipInput, countryInput];
+      let firstBad = null;
+      required.forEach((el) => {
+        const bad = !el.value.trim() || (el === zipInput && isIndia && !/^[1-9][0-9]{5}$/.test(el.value.replace(/\s/g, '')));
+        el.style.borderColor = bad ? '#D00000' : '';
+        if (bad && !firstBad) firstBad = el;
+      });
+      if (firstBad) {
+        firstBad.focus();
+        submitOrderBtn.textContent = firstBad === zipInput && isIndia ? 'ENTER A VALID 6-DIGIT PIN' : 'COMPLETE ALL ADDRESS FIELDS';
+        setTimeout(() => { submitOrderBtn.textContent = 'SUBMIT ORDER'; }, 2200);
+        return;
+      }
+
+      const record = {
+        id: 'order_' + Date.now(),
+        placedAt: new Date().toISOString(),
+        email: emailInput.value.trim(),
+        address: {
+          line1: addressInput.value.trim(),
+          line2: aptInput.value.trim(),
+          city: cityInput.value.trim(),
+          state: stateInput.value.trim(),
+          zip: zipInput.value.trim(),
+          country: countryInput.value.trim()
+        },
+        items: order,
+        subtotal: itemsSubtotal,
+        delivery: currentDelivery.charge,
+        deliveryZone: currentDelivery.label,
+        total: itemsSubtotal + currentDelivery.charge
+      };
+      try {
+        const prev = JSON.parse(localStorage.getItem('hotcatpics_orders') || '[]');
+        prev.push(record);
+        localStorage.setItem('hotcatpics_orders', JSON.stringify(prev));
+      } catch (err) {}
+
+      submitOrderBtn.textContent = `ORDER SUBMITTED ✓  TOTAL ₹${record.total.toFixed(2)}`;
       submitOrderBtn.classList.add('submitted');
       setTimeout(() => {
         submitOrderBtn.textContent = 'SUBMIT ORDER';
         submitOrderBtn.classList.remove('submitted');
-      }, 2200);
+      }, 3000);
     });
 
     renderSummaryPreview();
