@@ -1009,14 +1009,11 @@
       existing.push(presetItem);
       saveStore({ presets: existing });
 
-      // Sync to shared backend API when running over HTTP/HTTPS
-      if (location.protocol.startsWith('http')) {
-        fetch('/api/presets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(presetItem)
-        }).catch(() => {});
-      }
+      // Sync to shared cloud preset stream so everyone opening the link sees it
+      fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'share', preset: presetItem })
+      }).catch(() => {});
 
       // Permanent UI transition
       sharePresetBtn.classList.add('is-shared');
