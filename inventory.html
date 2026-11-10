@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="inventory.css?v=7" />
+  <link rel="stylesheet" href="inventory.css?v=8" />
   <style>
     /* Clip stickers to the rounded case body so edges never spill past the corners */
     .case-sticker-surface,
@@ -775,7 +775,9 @@
       caseCharmLayer.appendChild(loopEl);
     }
 
-    function createReceiptRow(label, priceNum) {
+    const TRASH_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 10v6M14 10v6"/></svg>';
+
+    function createReceiptRow(label, priceNum, onRemove) {
       const row = document.createElement('div');
       row.className = 'receipt-row';
 
@@ -793,6 +795,17 @@
       row.appendChild(nameSpan);
       row.appendChild(leaderSpan);
       row.appendChild(priceSpan);
+
+      if (onRemove) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'receipt-remove-btn';
+        delBtn.title = `Remove ${label}`;
+        delBtn.setAttribute('aria-label', `Remove ${label}`);
+        delBtn.innerHTML = TRASH_SVG;
+        delBtn.addEventListener('click', onRemove);
+        row.appendChild(delBtn);
+      }
       return row;
     }
 
@@ -800,12 +813,24 @@
       receiptLines.innerHTML = '';
 
       selectedStickers.forEach((sticker) => {
-        receiptLines.appendChild(createReceiptRow(sticker.name, sticker.price));
+        receiptLines.appendChild(createReceiptRow(sticker.name, sticker.price, () => {
+          selectedStickers.delete(sticker.id);
+          sharePresetBtn.classList.remove('is-shared');
+          syncBoxHighlights();
+          renderPreviewStickers();
+          renderReceipt();
+        }));
       });
 
       if (selectedCharmId && CHARM_DATA[selectedCharmId]) {
         const charm = CHARM_DATA[selectedCharmId];
-        receiptLines.appendChild(createReceiptRow(charm.name, charm.price));
+        receiptLines.appendChild(createReceiptRow(charm.name, charm.price, () => {
+          selectedCharmId = null;
+          sharePresetBtn.classList.remove('is-shared');
+          syncBoxHighlights();
+          renderPreviewCharm();
+          renderReceipt();
+        }));
       }
 
       if (selectedModel) {
