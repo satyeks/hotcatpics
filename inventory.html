@@ -121,6 +121,17 @@
       line-height: 15px;
       color: #555555;
     }
+    .btn-proceed-buy.is-locked,
+    .btn-proceed-buy:disabled {
+      opacity: 0.35 !important;
+      cursor: not-allowed !important;
+      pointer-events: auto !important;
+      transform: none !important;
+    }
+    .btn-proceed-buy.is-locked:hover,
+    .btn-proceed-buy:disabled:hover {
+      opacity: 0.35 !important;
+    }
   </style>
   <link rel="stylesheet" href="responsive.css?v=1" />
   <script src="responsive.js"></script>
@@ -363,7 +374,7 @@
               </button>
               <p class="share-preset-note">* Share your designed preset, you will receive a commission percentage on every copy sold of that preset.</p>
             </div>
-            <button type="button" class="action-btn btn-proceed-buy" id="proceedBuyBtn">PROCEED TO BUY</button>
+            <button type="button" class="action-btn btn-proceed-buy is-locked" id="proceedBuyBtn" disabled aria-disabled="true">PROCEED TO BUY</button>
           </div>
         </div>
       </div>
@@ -1011,27 +1022,10 @@
       sharePresetBtn.classList.add('is-shared');
     });
 
-    proceedBuyBtn.addEventListener('click', () => {
-      ensureCaseVisible();
-      cartCount += 1;
-      navCart.textContent = `CART ${cartCount}`;
-
-      const formattedModel = selectedModel === 'IPHONE 16' ? 'IPhone 16' : (selectedModel || 'IPhone 16');
-      const coverCode = CASE_COLOR_CODES[selectedCaseColor] || 'P_Cover2';
-
-      const currentOrder = {
-        model: selectedModel || 'IPHONE 16',
-        caseColor: selectedCaseColor,
-        bgColor: selectedBgColor,
-        includeCase: true,
-        caseLabel: `${formattedModel}: ${coverCode}`,
-        casePrice: 2499.00,
-        stickers: Array.from(selectedStickers.values()),
-        charm: selectedCharmId ? CHARM_DATA[selectedCharmId] : null
-      };
-
-      saveStore({ cartCount, currentOrder });
-      window.location.href = 'checkout.html';
+    // PROCEED TO BUY is currently locked/unclickable until unlocked
+    proceedBuyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (proceedBuyBtn.disabled || proceedBuyBtn.classList.contains('is-locked')) return;
     });
 
     // Initial receipt render
