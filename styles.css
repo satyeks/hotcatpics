@@ -1,0 +1,473 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+html {
+  width: 100%;
+  background: #FFFFFF;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  background: #FFFFFF;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 12 - Main Canvas */
+.landing-page {
+  position: relative;
+  width: 1470px;
+  min-height: 1620px;
+  margin: 0 auto;
+  background: #FFFFFF;
+}
+
+/* HOTCATPICS - Logo */
+.logo {
+  position: absolute;
+  width: 194px;
+  height: 33px;
+  left: 33px;
+  top: 28px;
+  font-family: 'Special Gothic Expanded One', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 32px;
+  color: #000000;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Top Navigation Shared Styles */
+.nav-item {
+  position: absolute;
+  height: 18px;
+  font-family: 'Sometype Mono', monospace;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 18px;
+  color: #000000;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* PRESETS */
+.nav-presets {
+  width: 61px;
+  left: 267px;
+  top: 35px;
+  font-weight: 600;
+}
+
+/* Rectangle 80 - Underline for PRESETS */
+.nav-presets.active::after {
+  content: '';
+  position: absolute;
+  width: 61px;
+  height: 1px;
+  left: 0;
+  top: 17px; /* 35px + 17px = 52px */
+  background: #000000;
+}
+
+/* INVENTORY */
+.nav-inventory {
+  width: 79px;
+  left: 352px;
+  top: 35px;
+  font-weight: 400;
+}
+
+/* PROFILE */
+.nav-profile {
+  width: 61px;
+  left: 455px;
+  top: 34px;
+  font-weight: 400;
+}
+
+/* WISHLIST */
+.nav-wishlist {
+  width: 70px;
+  left: 1292px;
+  top: 35px;
+  font-weight: 400;
+}
+
+/* CART 0 */
+.nav-cart {
+  width: 53px;
+  left: 1386px;
+  top: 35px;
+  font-weight: 400;
+}
+
+/* Group 8 - Close/Clear Icon */
+.close-btn {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  left: 31px;
+  top: 129px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.close-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #000000;
+}
+
+/* Rectangle 64 */
+.close-line.line-1 {
+  width: 15px;
+  height: 1px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Rectangle 65 */
+.close-line.line-2 {
+  width: 1px;
+  height: 15px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Group 13 - Filter Categories */
+.filter-item {
+  position: absolute;
+  height: 18px;
+  top: 127px;
+  font-family: 'Sometype Mono', monospace;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 18px;
+  color: #131313;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* BOTTLE */
+.filter-bottle {
+  width: 53px;
+  left: 65px;
+  font-weight: 400;
+}
+
+/* CASES */
+.filter-cases {
+  width: 44px;
+  left: 145px;
+  font-weight: 600;
+}
+
+/* LAPTOP */
+.filter-laptop {
+  width: 53px;
+  left: 212px;
+  font-weight: 400;
+}
+
+/* T-SHIRTS */
+.filter-tshirts {
+  width: 71px;
+  left: 295px;
+  font-weight: 400;
+}
+
+/* Scrollable Blocks Grid (4 columns default -> 2 columns on left when split-view is active) */
+.grid-container {
+  position: absolute;
+  left: 28px;
+  top: 175px;
+  width: 1413px;
+  display: grid;
+  grid-template-columns: repeat(4, 330px);
+  gap: 31px;
+  padding-bottom: 40px;
+  transition: top 0.35s cubic-bezier(0.22, 1, 0.36, 1), left 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.block {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.block.has-preset {
+  cursor: pointer;
+}
+
+/* Split-View State (when a preset is clicked/opened) */
+.filter-bar {
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.landing-page.split-view .filter-bar {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.landing-page.split-view .grid-container {
+  left: 42px;
+  top: 100px;
+  width: 691px;
+  grid-template-columns: repeat(2, 330px);
+  column-gap: 31px;
+  row-gap: 28px;
+}
+
+/* Right-Side Preset Detail Panel */
+.preset-detail-panel {
+  position: absolute;
+  left: 820px;
+  top: 100px;
+  width: 598px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.35s;
+}
+
+.landing-page.split-view .preset-detail-panel {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.detail-preview-box {
+  position: relative;
+  width: 598px;
+  height: 578px;
+  background: #5DC6E8;
+  overflow: hidden;
+  margin-bottom: 22px;
+  transition: background-color 0.3s ease;
+}
+
+.detail-case-stage {
+  position: absolute;
+  width: 374px;
+  height: 450px;
+  left: 112px;
+  top: 64px;
+}
+
+.detail-case-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.detail-sticker-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  z-index: 20;
+}
+
+.detail-placed-sticker {
+  position: absolute;
+  display: block;
+  object-fit: fill;
+}
+
+.detail-charm-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  z-index: 30;
+  overflow: visible;
+}
+
+.detail-placed-charm {
+  position: absolute;
+  display: block;
+  object-fit: fill;
+}
+
+.detail-charm-loop {
+  position: absolute;
+  left: 275px;
+  width: 6px;
+  height: 19px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 191px;
+}
+
+/* Accumulated PRICE Row */
+.detail-price-row {
+  display: flex;
+  align-items: baseline;
+  width: 598px;
+  font-family: 'Sometype Mono', monospace;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 42px;
+}
+
+.detail-price-label {
+  white-space: nowrap;
+}
+
+.detail-price-leader {
+  flex: 1;
+  border-bottom: 1px dashed #000000;
+  margin: 0 10px;
+  transform: translateY(-4px);
+}
+
+.detail-price-value {
+  white-space: nowrap;
+}
+
+/* Action Buttons: ADD TO CART & BUY */
+.detail-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 598px;
+}
+
+.detail-btn {
+  width: 274px;
+  height: 34px;
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  font-family: 'Sometype Mono', monospace;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.detail-btn:hover {
+  opacity: 0.88;
+}
+
+.detail-btn:active {
+  transform: scale(0.99);
+}
+
+/* Shared Preset Case Stage inside 330x330 Block (scales 374x450 preview stage to 236x284 at left: 47px, top: 23px) */
+.preset-case-stage {
+  position: absolute;
+  left: 47px;
+  top: 23px;
+  width: 374px;
+  height: 450px;
+  transform: scale(0.6311);
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.preset-case-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.preset-sticker-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  z-index: 10;
+}
+
+.preset-placed-sticker {
+  position: absolute;
+  display: block;
+  object-fit: fill;
+}
+
+.preset-charm-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 374px;
+  height: 450px;
+  z-index: 15;
+  overflow: visible;
+}
+
+.preset-placed-charm {
+  position: absolute;
+  display: block;
+  object-fit: fill;
+}
+
+.preset-charm-loop {
+  position: absolute;
+  left: 275px;
+  width: 6px;
+  height: 19px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 191px;
+}
+
+.preset-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 50%;
+  font-family: 'Sometype Mono', monospace;
+  font-size: 15px;
+  line-height: 20px;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 40;
+  transition: opacity 0.2s ease;
+}
+
+.block:hover .preset-remove-btn {
+  opacity: 1;
+}
+
