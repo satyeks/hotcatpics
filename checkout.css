@@ -504,3 +504,19 @@ body {
   line-height: 20px;
 }
 
+
+/* instagram - @hotcatpic */
+.site-footer {
+  position: absolute;
+  width: 192px;
+  height: 18px;
+  left: 639px;
+  bottom: 17px;
+  font-family: 'Sometype Mono', monospace;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 18px;
+  color: #545454;
+  white-space: nowrap;
+}
