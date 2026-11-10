@@ -9,6 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=8" />
   <style>
+    /* Clip stickers to the rounded case body so edges never spill past the corners */
+    .case-sticker-surface,
+    .preset-sticker-surface,
+    .detail-sticker-surface,
+    .summary-sticker-surface {
+      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
+      clip-path: inset(29px 96px 29px 88px round 38px) !important;
+    }
     *, html, body {
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
