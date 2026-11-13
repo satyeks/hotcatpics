@@ -66,13 +66,15 @@ html, body {
   .landing-page,
   .inventory-page,
   .checkout-page {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
     height: auto;
     min-height: 100vh !important;
-    margin: 0;
-    padding-bottom: 24px;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
   }
 
   /* ---------- Shared header ---------- */
@@ -157,15 +159,24 @@ html, body {
   }
 
   /* ---------- Shared footer ---------- */
-  .site-footer {
-    position: static;
-    left: auto;
-    bottom: auto;
-    width: auto;
-    height: auto;
-    margin: 56px auto 12px;
-    text-align: center;
-    order: 99;
+  .site-footer,
+  .policy-footer {
+    position: static !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 32px 16px max(24px, env(safe-area-inset-bottom)) !important;
+    text-align: center !important;
+    order: 99 !important;
+    box-sizing: border-box !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    color: #545454 !important;
   }
 
   /* ================= LANDING (index.html) ================= */
