@@ -7,16 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="inventory.css?v=14" />
+  <link rel="stylesheet" href="inventory.css?v=32" />
   <style>
-    /* Clip stickers to the rounded case body so edges never spill past the corners */
-    .case-sticker-surface,
-    .preset-sticker-surface,
-    .detail-sticker-surface,
-    .summary-sticker-surface {
-      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
-      clip-path: inset(29px 96px 29px 88px round 38px) !important;
-    }
     *, html, body {
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
@@ -32,12 +24,12 @@
     html, body {
       overflow-x: hidden !important;
     }
-    /* Override any Safari cached CSS rules so stickers and charms always appear on top immediately */
+    /* Override any Safari cached CSS rules so stickers always appear on top immediately */
     .preview-case-stack {
       overflow: visible !important;
+      touch-action: none !important;
     }
-    .case-sticker-surface,
-    .case-charm-layer {
+    .case-sticker-surface {
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
@@ -48,29 +40,32 @@
       overflow: visible !important;
       opacity: 1 !important;
       visibility: visible !important;
-    }
-    .case-sticker-surface {
       z-index: 20 !important;
       pointer-events: auto !important;
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
     }
-    .case-charm-layer {
-      z-index: 30 !important;
+    /* Yeezy-style asset protection: right clicking anywhere shows page context menu instead of "Open image in new tab" */
+    img,
+    .item-img,
+    .sticker-img,
+    .preview-case-img,
+    .placed-sticker {
       pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-drag: none !important;
     }
     .placed-sticker {
       position: absolute !important;
-      object-fit: fill !important;
-      cursor: grab !important;
-      user-select: none !important;
-      -webkit-user-drag: none !important;
-      pointer-events: auto !important;
+      object-fit: contain !important;
+      touch-action: none !important;
     }
-    .placed-charm {
-      position: absolute !important;
-      object-fit: fill !important;
-      user-select: none !important;
-      -webkit-user-drag: none !important;
-      pointer-events: none !important;
+    .placed-sticker.is-dragging {
+      cursor: grabbing !important;
     }
 
     /* Smooth permanent UI transition for SHARE TO PRESET button */
@@ -133,8 +128,8 @@
       opacity: 0.35 !important;
     }
   </style>
-  <link rel="stylesheet" href="responsive.css?v=1" />
-  <script src="responsive.js"></script>
+  <link rel="stylesheet" href="responsive.css?v=9" />
+  <script src="responsive.js?v=4"></script>
 </head>
 <body>
   <div class="inventory-page">
@@ -145,37 +140,23 @@
       <nav class="main-nav">
         <a href="index.html" class="nav-item nav-presets">PRESETS</a>
         <a href="inventory.html" class="nav-item nav-inventory active">INVENTORY</a>
-        <a href="#" class="nav-item nav-profile">PROFILE</a>
+        <a href="index.html#profile" class="nav-item nav-profile">PROFILE</a>
       </nav>
 
       <div class="header-right">
-        <a href="index.html#wishlist" class="nav-item nav-wishlist" id="navWishlist">WISHLIST 0</a>
-        <a href="#" class="nav-item nav-cart" id="navCart">CART 0</a>
+        <a href="index.html#wishlist" class="nav-item nav-wishlist" id="navWishlist">LIKED 0</a>
       </div>
     </header>
 
     <!-- Group 25: Sub-Navigation / Filter Bars -->
     <div class="sub-nav">
-      <!-- Group 12: Left Filter (STICKERS / CHARMS) -->
+      <!-- Group 12: Left Filter (STICKERS) -->
       <div class="left-filter">
         <button class="close-btn close-left" id="clearLeftFilter" aria-label="Clear left filter">
           <span class="close-line line-1"></span>
           <span class="close-line line-2"></span>
         </button>
         <a href="#" class="filter-item filter-stickers active" data-left-tab="stickers">STICKERS</a>
-        <a href="#" class="filter-item filter-charms" data-left-tab="charms">CHARMS</a>
-      </div>
-
-      <!-- Group 19: Right Filter (BOTTLE / CASES / LAPTOP / T-SHIRTS) -->
-      <div class="right-filter">
-        <button class="close-btn close-right" aria-label="Clear right filter">
-          <span class="close-line line-1"></span>
-          <span class="close-line line-2"></span>
-        </button>
-        <a href="#" class="filter-item filter-bottle">BOTTLE</a>
-        <a href="#" class="filter-item filter-cases active">CASES</a>
-        <a href="#" class="filter-item filter-laptop">LAPTOP</a>
-        <a href="#" class="filter-item filter-tshirts">T-SHIRTS</a>
       </div>
     </div>
 
@@ -184,58 +165,38 @@
       <!-- Left 2x3 Grid of Inventory Boxes -->
       <div class="inventory-grid" id="inventoryGrid" data-active-category="stickers">
         <!-- Box 1 (Top-Left: left 22px, top 162px) -->
-        <div class="inventory-box box-1" data-index="1" data-sticker-id="s1" data-charm-id="c1">
+        <div class="inventory-box box-1" data-index="1" data-sticker-id="s1">
           <img
             src="../stickers/1%206.png"
             alt="S_SpiderGuitar"
             class="item-img sticker-img sticker-1"
           />
-          <img
-            src="../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png"
-            alt="STAR_Charm"
-            class="item-img charm-img charm-1"
-          />
         </div>
 
         <!-- Box 2 (Top-Right: left 375px, top 162px) -->
-        <div class="inventory-box box-2" data-index="2" data-sticker-id="s2" data-charm-id="c2">
+        <div class="inventory-box box-2" data-index="2" data-sticker-id="s2">
           <img
             src="../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png"
             alt="S_SpiderPunk"
             class="item-img sticker-img sticker-2"
           />
-          <img
-            src="../charm/Screenshot%202026-11-04%20at%2010.20.53%E2%80%AFAM%203.png"
-            alt="C_RedDarumaCat"
-            class="item-img charm-img charm-2"
-          />
         </div>
 
         <!-- Box 3 (Middle-Left: left 22px, top 581px) -->
-        <div class="inventory-box box-3" data-index="3" data-sticker-id="s3" data-charm-id="c3">
+        <div class="inventory-box box-3" data-index="3" data-sticker-id="s3">
           <img
             src="../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png"
             alt="S_SpiderIDCard"
             class="item-img sticker-img sticker-3"
           />
-          <img
-            src="../charm/Screenshot%202026-11-04%20at%2010.21.14%E2%80%AFAM%203.png"
-            alt="C_WhiteLuckyCat"
-            class="item-img charm-img charm-3"
-          />
         </div>
 
         <!-- Box 4 (Middle-Right: left 375px, top 581px) -->
-        <div class="inventory-box box-4" data-index="4" data-sticker-id="s4" data-charm-id="c4">
+        <div class="inventory-box box-4" data-index="4" data-sticker-id="s4">
           <img
             src="../stickers/Screenshot%202026-11-04%20at%2010.51.07%E2%80%AFAM%202.png"
             alt="S_HobieIDCard"
             class="item-img sticker-img sticker-4"
-          />
-          <img
-            src="../charm/Screenshot%202026-11-04%20at%2010.21.30%E2%80%AFAM%203.png"
-            alt="C_GoldLuckyCat"
-            class="item-img charm-img charm-4"
           />
         </div>
 
@@ -264,18 +225,15 @@
         <div class="preview-frame" id="previewFrame">
           <span class="preview-label">PREVIEW</span>
 
-          <!-- Overlapping iPhone 16 Case + Stickers + Charm -->
+          <!-- Overlapping iPhone 16 Case + Stickers -->
           <div class="preview-case-stack visible" id="previewCaseStack">
-            <img src="../assets/case-red.png" alt="iPhone 16 Red Case" class="preview-case-img" data-case-color="red" />
-            <img src="../assets/case-blue.png" alt="iPhone 16 Blue Case" class="preview-case-img" data-case-color="blue" />
-            <img src="../assets/case-white.png" alt="iPhone 16 White Case" class="preview-case-img active" data-case-color="white" />
-            <img src="../assets/case-black.png" alt="iPhone 16 Black Case" class="preview-case-img" data-case-color="black" />
+            <img src="assets/case-red.png" alt="iPhone 16 Red Case" class="preview-case-img" data-case-color="red" />
+            <img src="assets/case-blue.png" alt="iPhone 16 Blue Case" class="preview-case-img" data-case-color="blue" />
+            <img src="assets/case-white.png" alt="iPhone 16 White Case" class="preview-case-img active" data-case-color="white" />
+            <img src="assets/case-black.png" alt="iPhone 16 Black Case" class="preview-case-img" data-case-color="black" />
 
             <!-- Stickers Surface Directly On Top of Case -->
             <div class="case-sticker-surface" id="caseStickerSurface"></div>
-
-            <!-- Charm Layer Directly On Top at Right Side of Case -->
-            <div class="case-charm-layer" id="caseCharmLayer"></div>
           </div>
         </div>
 
@@ -311,18 +269,6 @@
               <div class="brand-models-inner">
                 <div class="device-item sub-device" data-model="PIXEL 9">PIXEL 9</div>
                 <div class="device-item sub-device" data-model="PIXEL 9 PRO">PIXEL 9 PRO</div>
-                <div class="device-spacer"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- NOTHING Group -->
-          <div class="device-brand" data-brand="nothing">
-            <div class="device-item brand-title">NOTHING</div>
-            <div class="brand-models">
-              <div class="brand-models-inner">
-                <div class="device-item sub-device" data-model="PHONE (2)">PHONE (2)</div>
-                <div class="device-item sub-device" data-model="PHONE (2A)">PHONE (2A)</div>
               </div>
             </div>
           </div>
@@ -379,7 +325,7 @@
         </div>
       </div>
     </main>
-    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a></footer>
+    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a><span class="footer-sep">|</span><a href="privacy.html">privacy policy</a></footer>
   </div>
 
   <script>
@@ -388,7 +334,7 @@
       s1: {
         id: 's1',
         name: 'S_SpiderGuitar',
-        price: 299.00,
+        price: 149.00,
         src: '../stickers/1%206.png',
         left: 140,
         top: 132,
@@ -404,7 +350,7 @@
       s2: {
         id: 's2',
         name: 'S_SpiderPunk',
-        price: 249.00,
+        price: 119.00,
         src: '../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png',
         left: 80,
         top: 138,
@@ -420,7 +366,7 @@
       s3: {
         id: 's3',
         name: 'S_SpiderIDCard',
-        price: 259.00,
+        price: 99.00,
         src: '../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png',
         left: 142.5,
         top: 211.5,
@@ -436,7 +382,7 @@
       s4: {
         id: 's4',
         name: 'S_HobieIDCard',
-        price: 259.00,
+        price: 129.00,
         src: '../stickers/Screenshot%202026-11-04%20at%2010.51.07%E2%80%AFAM%202.png',
         left: 98,
         top: 290,
@@ -452,7 +398,7 @@
       s5: {
         id: 's5',
         name: 'S_HobieNote',
-        price: 229.00,
+        price: 89.00,
         src: '../stickers/Screenshot%202026-11-04%20at%2010.50.47%E2%80%AFAM%202.png',
         left: 102,
         top: 146,
@@ -468,7 +414,7 @@
       s6: {
         id: 's6',
         name: 'S_PunkLogo',
-        price: 279.00,
+        price: 139.00,
         src: '../stickers/Screenshot%202026-11-04%20at%2010.56.00%E2%80%AFAM%202.png',
         left: 94,
         top: 240,
@@ -483,57 +429,6 @@
       }
     };
 
-    const CHARM_DATA = {
-      c1: {
-        id: 'c1',
-        name: 'STAR_Charm',
-        price: 649.00,
-        src: '../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png',
-        left: 225,
-        top: 110,
-        width: 166,
-        height: 254,
-        rotate: 0,
-        loopTop: 126
-      },
-      c2: {
-        id: 'c2',
-        name: 'C_RedDarumaCat',
-        price: 599.00,
-        src: '../charm/Screenshot%202026-11-04%20at%2010.20.53%E2%80%AFAM%203.png',
-        left: 205,
-        top: 110,
-        width: 148,
-        height: 193,
-        rotate: 0,
-        loopTop: 120
-      },
-      c3: {
-        id: 'c3',
-        name: 'C_WhiteLuckyCat',
-        price: 599.00,
-        src: '../charm/Screenshot%202026-11-04%20at%2010.21.14%E2%80%AFAM%203.png',
-        left: 205,
-        top: 110,
-        width: 148,
-        height: 195,
-        rotate: 0,
-        loopTop: 120
-      },
-      c4: {
-        id: 'c4',
-        name: 'C_GoldLuckyCat',
-        price: 699.00,
-        src: '../charm/Screenshot%202026-11-04%20at%2010.21.30%E2%80%AFAM%203.png',
-        left: 205,
-        top: 110,
-        width: 148,
-        height: 176,
-        rotate: 0,
-        loopTop: 120
-      }
-    };
-
     const CASE_COLOR_CODES = {
       red: 'P_Cover1',
       white: 'P_Cover2',
@@ -541,9 +436,7 @@
       black: 'P_Cover4'
     };
 
-    const leftTabLinks = document.querySelectorAll('[data-left-tab]');
     const clearLeftFilter = document.getElementById('clearLeftFilter');
-    const inventoryGrid = document.getElementById('inventoryGrid');
     const inventoryBoxes = document.querySelectorAll('.inventory-box');
     const deviceBrands = document.querySelectorAll('.device-brand');
     const subDevices = document.querySelectorAll('.sub-device');
@@ -554,12 +447,11 @@
     const previewCaseStack = document.getElementById('previewCaseStack');
     const previewCaseImgs = document.querySelectorAll('.preview-case-img');
     const caseStickerSurface = document.getElementById('caseStickerSurface');
-    const caseCharmLayer = document.getElementById('caseCharmLayer');
+    const caseCameraOverlay = document.getElementById('caseCameraOverlay');
     const deviceColorSwatches = document.querySelectorAll('.device-color-swatch');
     const receiptLines = document.getElementById('receiptLines');
     const sharePresetBtn = document.getElementById('sharePresetBtn');
     const proceedBuyBtn = document.getElementById('proceedBuyBtn');
-    const navCart = document.getElementById('navCart');
 
     // Cross-file state helper (syncs localStorage and window.name so Safari file:// navigation keeps data permanently)
     try {
@@ -573,6 +465,18 @@
         }
       }
     } catch (e) {}
+
+    function getUserId() {
+      let uid = null;
+      try {
+        uid = localStorage.getItem('hotcatpics_user_id');
+        if (!uid) {
+          uid = 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+          localStorage.setItem('hotcatpics_user_id', uid);
+        }
+      } catch (e) {}
+      return uid || 'local_user';
+    }
 
     function loadStore() {
       let store = { v2: true };
@@ -588,13 +492,13 @@
         if (lsPresets) {
           store.presets = JSON.parse(lsPresets);
         }
-        const lsCart = localStorage.getItem('hotcatpics_cart_count');
-        if (lsCart !== null && store.cartCount === undefined) {
-          store.cartCount = parseInt(lsCart, 10) || 0;
-        }
         const lsWish = localStorage.getItem('hotcatpics_wishlist');
         if (lsWish) {
           store.wishlist = JSON.parse(lsWish);
+        }
+        const lsMine = localStorage.getItem('hotcatpics_my_presets_v2');
+        if (lsMine) {
+          store.myPresetsV2 = JSON.parse(lsMine);
         }
       } catch (e) {}
       return store;
@@ -609,11 +513,11 @@
         if (store.presets !== undefined) {
           localStorage.setItem('hotcatpics_presets_v2', JSON.stringify(store.presets));
         }
-        if (store.cartCount !== undefined) {
-          localStorage.setItem('hotcatpics_cart_count', String(store.cartCount));
-        }
         if (store.wishlist !== undefined) {
           localStorage.setItem('hotcatpics_wishlist', JSON.stringify(store.wishlist));
+        }
+        if (store.myPresetsV2 !== undefined) {
+          localStorage.setItem('hotcatpics_my_presets_v2', JSON.stringify(store.myPresetsV2));
         }
         if (store.currentOrder !== undefined) {
           localStorage.setItem('hotcatpics_current_order', JSON.stringify(store.currentOrder));
@@ -622,19 +526,15 @@
     }
 
     // State
-    let activeTab = 'stickers';
     let selectedModel = 'IPHONE 16';
     let selectedCaseColor = 'white';
     let selectedBgColor = '#5DC6E8';
     const selectedStickers = new Map();
-    let selectedCharmId = null;
     let topZCounter = 30;
     const initialStore = loadStore();
-    let cartCount = initialStore.cartCount || 0;
-    navCart.textContent = `CART ${cartCount}`;
     const navWishlist = document.getElementById('navWishlist');
     const wishCount = Array.isArray(initialStore.wishlist) ? initialStore.wishlist.length : 0;
-    if (navWishlist) navWishlist.textContent = `WISHLIST ${wishCount}`;
+    if (navWishlist) navWishlist.textContent = `LIKED ${wishCount}`;
 
     function ensureCaseVisible() {
       if (!selectedModel) {
@@ -654,23 +554,122 @@
 
     function syncBoxHighlights() {
       inventoryBoxes.forEach((box) => {
-        if (activeTab === 'stickers') {
-          const sId = box.dataset.stickerId;
-          box.classList.toggle('selected', Boolean(sId && selectedStickers.has(sId)));
-        } else {
-          const cId = box.dataset.charmId;
-          box.classList.toggle('selected', Boolean(cId && selectedCharmId === cId));
-        }
+        const sId = box.dataset.stickerId;
+        box.classList.toggle('selected', Boolean(sId && selectedStickers.has(sId)));
       });
+    }
+
+    // Usable bounds on the 374x450 case container (assets/case-white.png scaled by 0.5):
+    // Case body bounds: x in [88, 278], y in [30, 416]
+    // Camera module bounds (top-left island): x in [88, 186], y in [28, 130]
+    // Stickers are NEVER allowed inside the camera island and NEVER allowed outside the phone case.
+    const CASE_BOUNDS = { minX: 88, maxX: 278, minY: 30, maxY: 416 };
+    const CAM_BOX = { left: 88, right: 186, top: 28, bottom: 130 };
+
+    function getStickerMetrics(stickerObj) {
+      const canonical = STICKER_DATA[stickerObj.id] || stickerObj;
+      const rot = Math.abs(stickerObj.rotate) === 90;
+      const width = canonical.width;
+      const height = canonical.height;
+      const padL = rot ? 0 : (canonical.padL || 0);
+      const padR = rot ? 0 : (canonical.padR || 0);
+      const padT = rot ? 0 : (canonical.padT || 0);
+      const padB = rot ? 0 : (canonical.padB || 0);
+      const ox = padL + (width - padL - padR) / 2;
+      const oy = padT + (height - padT - padB) / 2;
+      const visW = rot ? height : (width - padL - padR);
+      const visH = rot ? width : (height - padT - padB);
+      return { width, height, ox, oy, visW, visH };
+    }
+
+    function clampStickerToCase(sticker, explicitCx, explicitCy) {
+      const m = getStickerMetrics(sticker);
+      const halfVisW = m.visW / 2;
+      const halfVisH = m.visH / 2;
+      let cx = typeof explicitCx === 'number' ? explicitCx : (sticker.left + m.ox);
+      let cy = typeof explicitCy === 'number' ? explicitCy : (sticker.top + m.oy);
+
+      // Hard boundary clamp: NO visible edge may EVER spill outside the phone case body
+      const minAllowedCx = CASE_BOUNDS.minX + halfVisW;
+      const maxAllowedCx = CASE_BOUNDS.maxX - halfVisW;
+      const minAllowedCy = CASE_BOUNDS.minY + halfVisH;
+      const maxAllowedCy = CASE_BOUNDS.maxY - halfVisH;
+
+      if (minAllowedCx <= maxAllowedCx) {
+        cx = Math.max(minAllowedCx, Math.min(maxAllowedCx, cx));
+      } else {
+        cx = (CASE_BOUNDS.minX + CASE_BOUNDS.maxX) / 2;
+      }
+
+      if (minAllowedCy <= maxAllowedCy) {
+        cy = Math.max(minAllowedCy, Math.min(maxAllowedCy, cy));
+      } else {
+        cy = (CASE_BOUNDS.minY + CASE_BOUNDS.maxY) / 2;
+      }
+
+      // Camera module collision: stickers can NEVER enter the camera island
+      const sLeft = cx - halfVisW;
+      const sRight = cx + halfVisW;
+      const sTop = cy - halfVisH;
+      const sBottom = cy + halfVisH;
+
+      const spaceBeside = CASE_BOUNDS.maxX - CAM_BOX.right; // 92px corridor
+      const fitsBeside = m.visW <= spaceBeside;
+
+      if (sLeft < CAM_BOX.right && sRight > CAM_BOX.left && sTop < CAM_BOX.bottom && sBottom > CAM_BOX.top) {
+        if (fitsBeside && cx >= (CAM_BOX.right + CASE_BOUNDS.maxX) / 2 - 12) {
+          cx = Math.max(CAM_BOX.right + halfVisW, Math.min(CASE_BOUNDS.maxX - halfVisW, cx));
+          cy = Math.max(CASE_BOUNDS.minY + halfVisH, Math.min(CAM_BOX.bottom - halfVisH, cy));
+        } else {
+          cy = Math.max(CAM_BOX.bottom + halfVisH, Math.min(CASE_BOUNDS.maxY - halfVisH, cy));
+        }
+      } else if (sTop < CAM_BOX.bottom) {
+        if (!fitsBeside) {
+          cy = Math.max(CAM_BOX.bottom + halfVisH, Math.min(CASE_BOUNDS.maxY - halfVisH, cy));
+        } else if (cx - halfVisW < CAM_BOX.right) {
+          if (cx >= (CAM_BOX.right + CASE_BOUNDS.maxX) / 2 - 12) {
+            cx = Math.max(CAM_BOX.right + halfVisW, Math.min(CASE_BOUNDS.maxX - halfVisW, cx));
+          } else {
+            cy = Math.max(CAM_BOX.bottom + halfVisH, Math.min(CASE_BOUNDS.maxY - halfVisH, cy));
+          }
+        }
+      }
+
+      // Final sanity re-clamp firmly to case boundaries
+      if (minAllowedCx <= maxAllowedCx) {
+        cx = Math.max(minAllowedCx, Math.min(maxAllowedCx, cx));
+      }
+      if (minAllowedCy <= maxAllowedCy) {
+        cy = Math.max(minAllowedCy, Math.min(maxAllowedCy, cy));
+      }
+
+      sticker.width = m.width;
+      sticker.height = m.height;
+      sticker.left = Math.round((cx - m.ox) * 10) / 10;
+      sticker.top = Math.round((cy - m.oy) * 10) / 10;
     }
 
     function renderPreviewStickers() {
       caseStickerSurface.innerHTML = '';
       selectedStickers.forEach((sticker) => {
+        // Ensure canonical non-distorted dimensions are always preserved
+        const canonical = STICKER_DATA[sticker.id];
+        if (canonical) {
+          sticker.width = canonical.width;
+          sticker.height = canonical.height;
+          sticker.padL = canonical.padL;
+          sticker.padR = canonical.padR;
+          sticker.padT = canonical.padT;
+          sticker.padB = canonical.padB;
+        }
+        clampStickerToCase(sticker);
+
         const img = document.createElement('img');
         img.src = sticker.src;
         img.alt = sticker.name;
         img.className = 'placed-sticker';
+        img.dataset.stickerId = sticker.id;
+        img.draggable = false;
         img.style.position = 'absolute';
         img.style.display = 'block';
         img.style.opacity = '1';
@@ -682,130 +681,149 @@
         img.style.zIndex = String(sticker.zIndex || 25);
         img.style.transform = sticker.rotate ? `rotate(${sticker.rotate}deg)` : 'none';
 
-        makeStickerDraggable(img, sticker);
+        sticker.el = img;
         caseStickerSurface.appendChild(img);
       });
     }
 
-    // Usable areas on the 374x450 case: main back (x 90..276, y 130..412) and the
-    // narrow strip beside the camera bump (x 190..277, y 30..412). Stickers that are
-    // dragged into the strip shrink to fit and grow back when dragged out.
-    const CASE_AREA = { minX: 90, maxX: 276, minY: 130, maxY: 412 };
-    const STRIP_AREA = { minX: 190, maxX: 274, minY: 48, maxY: 410 };
+    function clientToCaseCoords(clientX, clientY) {
+      const rect = caseStickerSurface.getBoundingClientRect();
+      const scaleX = (rect.width || 374) / 374;
+      const scaleY = (rect.height || 450) / 450;
+      return {
+        x: (clientX - rect.left) / scaleX,
+        y: (clientY - rect.top) / scaleY,
+        scaleX,
+        scaleY
+      };
+    }
 
-    function makeStickerDraggable(el, stickerObj) {
-      let isDragging = false;
-      let startX = 0;
-      let startY = 0;
+    function pickStickerAtPoint(caseX, caseY, targetEl) {
+      // First check all selected stickers in descending zIndex order using visible bounds + 18px touch halo
+      const list = Array.from(selectedStickers.values()).sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+      const TOUCH_HALO = 18;
+      for (const s of list) {
+        const m = getStickerMetrics(s);
+        const cx = s.left + m.ox;
+        const cy = s.top + m.oy;
+        const halfW = m.visW / 2 + TOUCH_HALO;
+        const halfH = m.visH / 2 + TOUCH_HALO;
+        if (caseX >= cx - halfW && caseX <= cx + halfW && caseY >= cy - halfH && caseY <= cy + halfH) {
+          return s;
+        }
+      }
+      if (targetEl && targetEl.dataset && targetEl.dataset.stickerId) {
+        return selectedStickers.get(targetEl.dataset.stickerId) || null;
+      }
+      return null;
+    }
+
+    // Unified Touch + Pointer drag controller so mobile and desktop users can drag stickers effortlessly
+    (function setupUnifiedStickerDrag() {
+      let activeSticker = null;
+      let startCaseX = 0;
+      let startCaseY = 0;
       let startCx = 0;
       let startCy = 0;
-      let dragScale = 1;
 
-      if (!stickerObj.base) {
-        const rot = Math.abs(stickerObj.rotate) === 90;
-        stickerObj.base = {
-          width: stickerObj.width,
-          height: stickerObj.height,
-          padL: rot ? 0 : (stickerObj.padL || 0),
-          padR: rot ? 0 : (stickerObj.padR || 0),
-          padT: rot ? 0 : (stickerObj.padT || 0),
-          padB: rot ? 0 : (stickerObj.padB || 0),
-          rot
-        };
-        stickerObj.scale = 1;
-      }
-      const B = stickerObj.base;
-      // visible-box centre offset inside the element, and visible size, in base units
-      const ox = B.padL + (B.width - B.padL - B.padR) / 2;
-      const oy = B.padT + (B.height - B.padT - B.padB) / 2;
-      const visW = B.rot ? B.height : (B.width - B.padL - B.padR);
-      const visH = B.rot ? B.width : (B.height - B.padT - B.padB);
+      function beginDrag(clientX, clientY, targetEl, rawEvent) {
+        if (selectedStickers.size === 0) return false;
+        const pt = clientToCaseCoords(clientX, clientY);
+        const hit = pickStickerAtPoint(pt.x, pt.y, targetEl);
+        if (!hit) return false;
 
-      el.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        dragScale = (caseStickerSurface.getBoundingClientRect().width / 374) || 1;
-        const sc = stickerObj.scale || 1;
-        startCx = stickerObj.left + ox * sc;
-        startCy = stickerObj.top + oy * sc;
+        if (rawEvent && rawEvent.cancelable) rawEvent.preventDefault();
+        if (rawEvent) rawEvent.stopPropagation();
+
+        activeSticker = hit;
+        const m = getStickerMetrics(hit);
+        startCaseX = pt.x;
+        startCaseY = pt.y;
+        startCx = hit.left + m.ox;
+        startCy = hit.top + m.oy;
+
         topZCounter += 1;
-        stickerObj.zIndex = topZCounter;
-        el.style.zIndex = String(topZCounter);
-        el.setPointerCapture(e.pointerId);
-      });
-
-      el.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        const cx = startCx + (e.clientX - startX) / dragScale;
-        const cy = startCy + (e.clientY - startY) / dragScale;
-
-        // Decide whether the sticker is being pushed up beside the camera
-        const wantsStrip = cx >= 185 && (cy - visH / 2) < 126;
-        let sc = 1;
-        let area = CASE_AREA;
-        if (wantsStrip) {
-          area = STRIP_AREA;
-          const stripW = STRIP_AREA.maxX - STRIP_AREA.minX;
-          sc = Math.min(1, stripW / visW);
+        hit.zIndex = topZCounter;
+        if (hit.el) {
+          hit.el.style.zIndex = String(topZCounter);
+          hit.el.classList.add('is-dragging');
         }
-
-        const w = visW * sc;
-        const h = visH * sc;
-        const clampedCx = Math.max(area.minX + w / 2, Math.min(area.maxX - w / 2, cx));
-        const clampedCy = Math.max(area.minY + h / 2, Math.min(area.maxY - h / 2, cy));
-
-        stickerObj.scale = sc;
-        stickerObj.width = B.width * sc;
-        stickerObj.height = B.height * sc;
-        stickerObj.padL = B.padL * sc;
-        stickerObj.padR = B.padR * sc;
-        stickerObj.padT = B.padT * sc;
-        stickerObj.padB = B.padB * sc;
-        stickerObj.left = Math.round((clampedCx - ox * sc) * 10) / 10;
-        stickerObj.top = Math.round((clampedCy - oy * sc) * 10) / 10;
-
-        el.style.width = `${stickerObj.width}px`;
-        el.style.height = `${stickerObj.height}px`;
-        el.style.left = `${stickerObj.left}px`;
-        el.style.top = `${stickerObj.top}px`;
-      });
-
-      el.addEventListener('pointerup', () => {
-        isDragging = false;
-      });
-    }
-
-    function renderPreviewCharm() {
-      caseCharmLayer.innerHTML = '';
-      if (!selectedCharmId || !CHARM_DATA[selectedCharmId]) return;
-      const charm = CHARM_DATA[selectedCharmId];
-
-      const loopEl = document.createElement('div');
-      loopEl.className = 'case-charm-loop';
-      loopEl.style.top = `${charm.loopTop}px`;
-
-      const img = document.createElement('img');
-      img.src = charm.src;
-      img.alt = charm.name;
-      img.className = 'placed-charm';
-      img.style.position = 'absolute';
-      img.style.display = 'block';
-      img.style.opacity = '1';
-      img.style.visibility = 'visible';
-      img.style.left = `${charm.left}px`;
-      img.style.top = `${charm.top}px`;
-      img.style.width = `${charm.width}px`;
-      img.style.height = `${charm.height}px`;
-      if (charm.rotate) {
-        img.style.transform = `rotate(${charm.rotate}deg)`;
+        caseStickerSurface.style.cursor = 'grabbing';
+        document.body.style.cursor = 'grabbing';
+        return true;
       }
 
-      caseCharmLayer.appendChild(img);
-      caseCharmLayer.appendChild(loopEl);
-    }
+      function moveDrag(clientX, clientY, rawEvent) {
+        if (!activeSticker) return;
+        if (rawEvent && rawEvent.cancelable) rawEvent.preventDefault();
+
+        const pt = clientToCaseCoords(clientX, clientY);
+        const m = getStickerMetrics(activeSticker);
+        const cx = startCx + (pt.x - startCaseX);
+        const cy = startCy + (pt.y - startCaseY);
+
+        // Strict boundary clamp (NEVER outside case) & camera module collision (NEVER inside camera)
+        clampStickerToCase(activeSticker, cx, cy);
+
+        if (activeSticker.el) {
+          activeSticker.el.style.width = `${activeSticker.width}px`;
+          activeSticker.el.style.height = `${activeSticker.height}px`;
+          activeSticker.el.style.left = `${activeSticker.left}px`;
+          activeSticker.el.style.top = `${activeSticker.top}px`;
+        }
+        sharePresetBtn.classList.remove('is-shared');
+      }
+
+      function endDrag() {
+        if (activeSticker && activeSticker.el) {
+          activeSticker.el.classList.remove('is-dragging');
+        }
+        activeSticker = null;
+        caseStickerSurface.style.cursor = 'default';
+        document.body.style.cursor = '';
+      }
+
+      // Touch events (iOS Safari / Android mobile) with passive: false so page never scrolls during sticker drag
+      previewCaseStack.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length === 0) return;
+        const t = e.touches[0];
+        beginDrag(t.clientX, t.clientY, e.target, e);
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!activeSticker || !e.touches || e.touches.length === 0) return;
+        const t = e.touches[0];
+        moveDrag(t.clientX, t.clientY, e);
+      }, { passive: false });
+
+      window.addEventListener('touchend', endDrag);
+      window.addEventListener('touchcancel', endDrag);
+
+      // Dynamically indicate draggable sticker under pointer on desktop
+      caseStickerSurface.addEventListener('pointermove', (e) => {
+        if (activeSticker || e.pointerType === 'touch') return;
+        const pt = clientToCaseCoords(e.clientX, e.clientY);
+        const hit = pickStickerAtPoint(pt.x, pt.y);
+        caseStickerSurface.style.cursor = hit ? 'grab' : 'default';
+      });
+
+      // Pointer/Mouse events (desktop & hybrid devices)
+      previewCaseStack.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') return; // Handled by touchstart above
+        if (e.button !== 0 && e.button !== undefined) return; // Only primary button starts drag; allows native contextmenu on right click
+        beginDrag(e.clientX, e.clientY, e.target, e);
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!activeSticker || e.pointerType === 'touch') return;
+        moveDrag(e.clientX, e.clientY, e);
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (e.pointerType === 'touch') return;
+        endDrag();
+      });
+    })();
 
     const TRASH_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 10v6M14 10v6"/></svg>';
 
@@ -822,7 +840,7 @@
 
       const priceSpan = document.createElement('span');
       priceSpan.className = 'receipt-item-price';
-      priceSpan.textContent = `₹${priceNum.toFixed(2)}`;
+      priceSpan.textContent = `₹${Math.round(priceNum)}`;
 
       row.appendChild(nameSpan);
       row.appendChild(leaderSpan);
@@ -854,44 +872,20 @@
         }));
       });
 
-      if (selectedCharmId && CHARM_DATA[selectedCharmId]) {
-        const charm = CHARM_DATA[selectedCharmId];
-        receiptLines.appendChild(createReceiptRow(charm.name, charm.price, () => {
-          selectedCharmId = null;
-          sharePresetBtn.classList.remove('is-shared');
-          syncBoxHighlights();
-          renderPreviewCharm();
-          renderReceipt();
-        }));
-      }
-
       if (selectedModel) {
         const formattedModel = selectedModel === 'IPHONE 16'
           ? 'IPhone 16'
           : selectedModel;
         const coverCode = CASE_COLOR_CODES[selectedCaseColor] || 'P_Cover2';
-        receiptLines.appendChild(createReceiptRow(`${formattedModel}: ${coverCode}`, 2499.00));
+        receiptLines.appendChild(createReceiptRow(`${formattedModel}: ${coverCode}`, 500.00));
       }
     }
 
-    leftTabLinks.forEach((tabLink) => {
-      tabLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        leftTabLinks.forEach((link) => link.classList.remove('active'));
-        tabLink.classList.add('active');
-        activeTab = tabLink.dataset.leftTab;
-        inventoryGrid.dataset.activeCategory = activeTab;
-        syncBoxHighlights();
-      });
-    });
-
     clearLeftFilter.addEventListener('click', () => {
       selectedStickers.clear();
-      selectedCharmId = null;
       sharePresetBtn.classList.remove('is-shared');
       syncBoxHighlights();
       renderPreviewStickers();
-      renderPreviewCharm();
       renderReceipt();
     });
 
@@ -901,28 +895,18 @@
         ensureCaseVisible();
         sharePresetBtn.classList.remove('is-shared');
 
-        if (activeTab === 'stickers') {
-          const sId = box.dataset.stickerId;
-          if (!sId || !STICKER_DATA[sId]) return;
+        const sId = box.dataset.stickerId;
+        if (!sId || !STICKER_DATA[sId]) return;
 
-          if (selectedStickers.has(sId)) {
-            selectedStickers.delete(sId);
-          } else {
-            topZCounter += 1;
-            selectedStickers.set(sId, { ...STICKER_DATA[sId], zIndex: topZCounter });
-          }
-          syncBoxHighlights();
-          renderPreviewStickers();
-          renderReceipt();
-        } else if (activeTab === 'charms') {
-          const cId = box.dataset.charmId;
-          if (!cId || !CHARM_DATA[cId]) return;
-
-          selectedCharmId = selectedCharmId === cId ? null : cId;
-          syncBoxHighlights();
-          renderPreviewCharm();
-          renderReceipt();
+        if (selectedStickers.has(sId)) {
+          selectedStickers.delete(sId);
+        } else {
+          topZCounter += 1;
+          selectedStickers.set(sId, { ...STICKER_DATA[sId], zIndex: topZCounter });
         }
+        syncBoxHighlights();
+        renderPreviewStickers();
+        renderReceipt();
       });
     });
 
@@ -930,17 +914,10 @@
       const titleEl = brandEl.querySelector('.brand-title');
       titleEl.addEventListener('click', () => {
         const isAlreadyOpen = brandEl.classList.contains('open');
-
         deviceBrands.forEach((b) => b.classList.remove('open'));
-        subDevices.forEach((m) => m.classList.remove('active'));
-        modelColorSection.classList.remove('visible');
-        previewCaseStack.classList.remove('visible');
-        selectedModel = null;
-
         if (!isAlreadyOpen) {
           brandEl.classList.add('open');
         }
-        renderReceipt();
       });
     });
 
@@ -958,11 +935,6 @@
 
     clearDeviceFilter.addEventListener('click', () => {
       deviceBrands.forEach((b) => b.classList.remove('open'));
-      subDevices.forEach((m) => m.classList.remove('active'));
-      modelColorSection.classList.remove('visible');
-      previewCaseStack.classList.remove('visible');
-      selectedModel = null;
-      renderReceipt();
     });
 
     bgSwatches.forEach((swatch) => {
@@ -995,11 +967,11 @@
 
       const presetItem = {
         id: 'preset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        ownerId: getUserId(),
         model: selectedModel || 'IPHONE 16',
         caseColor: selectedCaseColor,
         bgColor: selectedBgColor,
-        stickers: Array.from(selectedStickers.values()),
-        charm: selectedCharmId ? CHARM_DATA[selectedCharmId] : null,
+        stickers: Array.from(selectedStickers.values()).map(({ el, ...rest }) => rest),
         orders: 0,
         createdAt: Date.now()
       };
@@ -1007,7 +979,11 @@
       const store = loadStore();
       const existing = Array.isArray(store.presets) ? store.presets : [];
       existing.push(presetItem);
-      saveStore({ presets: existing });
+      const myPresetsV2 = Array.isArray(store.myPresetsV2) ? store.myPresetsV2 : [];
+      if (!myPresetsV2.includes(presetItem.id)) {
+        myPresetsV2.push(presetItem.id);
+      }
+      saveStore({ presets: existing, myPresetsV2 });
 
       // Sync to shared cloud preset stream so everyone opening the link sees it
       fetch('https://ntfy.sh/hotcatpics_cloud_v2_9380ba82', {

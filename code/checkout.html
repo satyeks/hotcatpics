@@ -7,16 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;600&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="checkout.css?v=10" />
+  <link rel="stylesheet" href="checkout.css?v=15" />
   <style>
-    /* Clip stickers to the rounded case body so edges never spill past the corners */
-    .case-sticker-surface,
-    .preset-sticker-surface,
-    .detail-sticker-surface,
-    .summary-sticker-surface {
-      -webkit-clip-path: inset(29px 96px 29px 88px round 38px) !important;
-      clip-path: inset(29px 96px 29px 88px round 38px) !important;
-    }
     *, html, body {
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
@@ -32,19 +24,20 @@
     html, body {
       overflow-x: hidden !important;
     }
-    .summary-sticker-surface,
-    .summary-charm-layer {
+    .summary-sticker-surface {
       -webkit-mask-image: none !important;
       mask-image: none !important;
       overflow: visible !important;
       opacity: 1 !important;
       visibility: visible !important;
+      z-index: 20 !important;
     }
-    .summary-sticker-surface { z-index: 20 !important; }
-    .summary-charm-layer { z-index: 30 !important; }
+    .summary-placed-sticker {
+      object-fit: contain !important;
+    }
   </style>
-  <link rel="stylesheet" href="responsive.css?v=1" />
-  <script src="responsive.js"></script>
+  <link rel="stylesheet" href="responsive.css?v=9" />
+  <script src="responsive.js?v=4"></script>
 </head>
 <body>
   <div class="checkout-page">
@@ -71,7 +64,7 @@
         </div>
 
         <label class="subscribe-row">
-          <input type="checkbox" id="subscribeCheck" checked />
+          <input type="checkbox" id="subscribeCheck" />
           <span class="custom-round-check">
             <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
               <path d="M1 3.5L3.2 5.7L8 1" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -236,7 +229,6 @@
         <div class="summary-case-stack" id="summaryCaseStack">
           <img src="../assets/case-white.png" alt="Phone Case" class="summary-case-img" id="summaryCaseImg" />
           <div class="summary-sticker-surface" id="summaryStickerSurface"></div>
-          <div class="summary-charm-layer" id="summaryCharmLayer"></div>
         </div>
       </div>
 
@@ -262,11 +254,11 @@
         <div class="receipt-row total-row">
           <span class="receipt-item-name">TOTAL</span>
           <span class="receipt-item-leader"></span>
-          <span class="receipt-item-price" id="totalPrice">₹0.00</span>
+          <span class="receipt-item-price" id="totalPrice">--</span>
         </div>
       </div>
     </section>
-    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a></footer>
+    <footer class="site-footer"><a href="https://www.instagram.com/hotcatpic/" target="_blank" rel="noopener noreferrer">instagram - @hotcatpic</a><span class="footer-sep">|</span><a href="privacy.html">privacy policy</a></footer>
   </div>
 
   <script>
@@ -277,6 +269,24 @@
       black: '../assets/case-black.png'
     };
 
+    const STICKER_PRICE_MAP = {
+      s1: 149.00,
+      s2: 119.00,
+      s3: 99.00,
+      s4: 129.00,
+      s5: 89.00,
+      s6: 139.00
+    };
+
+    const STICKER_PRICE_BY_NAME = {
+      'S_SpiderGuitar': 149.00,
+      'S_SpiderPunk': 119.00,
+      'S_SpiderIDCard': 99.00,
+      'S_HobieIDCard': 129.00,
+      'S_HobieNote': 89.00,
+      'S_PunkLogo': 139.00
+    };
+
     // Fallback default order matching screenshot if user visits checkout.html directly
     const DEFAULT_ORDER = {
       model: 'IPHONE 16',
@@ -284,12 +294,12 @@
       bgColor: '#5DC6E8',
       includeCase: true,
       caseLabel: 'IPhone 16: P_Cover2',
-      casePrice: 2499.00,
+      casePrice: 500.00,
       stickers: [
         {
           id: 's2',
           name: 'S_SpiderPunk',
-          price: 249.00,
+          price: 119.00,
           src: '../stickers/Screenshot%202026-11-03%20at%2011.46.57%E2%80%AFPM%204.png',
           left: 80,
           top: 138,
@@ -301,7 +311,7 @@
         {
           id: 's3',
           name: 'S_SpiderIDCard',
-          price: 259.00,
+          price: 99.00,
           src: '../stickers/Screenshot%202026-01-20%20at%2023.10.06%205.png',
           left: 142.5,
           top: 211.5,
@@ -310,19 +320,7 @@
           rotate: 90,
           zIndex: 11
         }
-      ],
-      charm: {
-        id: 'c1',
-        name: 'STAR_Charm',
-        price: 649.00,
-        src: '../charm/Screenshot%202026-04-19%20at%2015.44.42%206.png',
-        left: 225,
-        top: 110,
-        width: 166,
-        height: 254,
-        rotate: 0,
-        loopTop: 126
-      }
+      ]
     };
 
     let rawOrder = localStorage.getItem('hotcatpics_current_order');
@@ -338,8 +336,8 @@
     if (rawOrder) {
       try {
         const parsed = JSON.parse(rawOrder);
-        // Use saved order if it has at least a case, sticker, or charm
-        if (parsed && (parsed.includeCase || (parsed.stickers && parsed.stickers.length) || parsed.charm)) {
+        // Use saved order if it has at least a case or sticker
+        if (parsed && (parsed.includeCase || (parsed.stickers && parsed.stickers.length))) {
           order = parsed;
         }
       } catch (e) {
@@ -350,7 +348,6 @@
     const summaryPreviewFrame = document.getElementById('summaryPreviewFrame');
     const summaryCaseImg = document.getElementById('summaryCaseImg');
     const summaryStickerSurface = document.getElementById('summaryStickerSurface');
-    const summaryCharmLayer = document.getElementById('summaryCharmLayer');
     const summaryReceiptLines = document.getElementById('summaryReceiptLines');
     const deliveryLabel = document.getElementById('deliveryLabel');
     const deliveryPriceEl = document.getElementById('deliveryPrice');
@@ -367,50 +364,40 @@
     const checkoutForm = document.getElementById('checkoutForm');
     const submitOrderBtn = document.getElementById('submitOrderBtn');
 
-    // Render the customized case, stickers, and charm inside the Order Summary Preview
+    const CANONICAL_STICKER_DIMS = {
+      s1: { width: 152, height: 152 },
+      s2: { width: 143, height: 255 },
+      s3: { width: 143, height: 104 },
+      s4: { width: 170, height: 126 },
+      s5: { width: 152, height: 143 },
+      s6: { width: 174, height: 129 }
+    };
+
+    // Render the customized case and stickers inside the Order Summary Preview
     function renderSummaryPreview() {
       summaryPreviewFrame.style.backgroundColor = order.bgColor || '#5DC6E8';
-      summaryCaseImg.src = CASE_IMAGE_MAP[order.caseColor] || CASE_IMAGE_MAP.white;
+      const caseSrc = CASE_IMAGE_MAP[order.caseColor] || CASE_IMAGE_MAP.white;
+      summaryCaseImg.src = caseSrc;
 
       summaryStickerSurface.innerHTML = '';
       if (Array.isArray(order.stickers)) {
         order.stickers.forEach((sticker) => {
+          const dims = (sticker.id && CANONICAL_STICKER_DIMS[sticker.id]) || sticker;
           const sImg = document.createElement('img');
-          sImg.src = sticker.src.replace(/^(stickers|charm|assets)\//, '../$1/');
+          sImg.src = sticker.src.startsWith("../") ? sticker.src : "../" + sticker.src.replace(/^\.\//, "");
           sImg.alt = sticker.name;
           sImg.className = 'summary-placed-sticker';
+          sImg.draggable = false;
           sImg.style.left = `${sticker.left}px`;
           sImg.style.top = `${sticker.top}px`;
-          sImg.style.width = `${sticker.width}px`;
-          sImg.style.height = `${sticker.height}px`;
+          sImg.style.width = `${dims.width}px`;
+          sImg.style.height = `${dims.height}px`;
           sImg.style.zIndex = String(sticker.zIndex || 2);
           if (sticker.rotate) {
             sImg.style.transform = `rotate(${sticker.rotate}deg)`;
           }
           summaryStickerSurface.appendChild(sImg);
         });
-      }
-
-      summaryCharmLayer.innerHTML = '';
-      if (order.charm) {
-        const cImg = document.createElement('img');
-        cImg.src = order.charm.src.replace(/^(stickers|charm|assets)\//, '../$1/');
-        cImg.alt = order.charm.name;
-        cImg.className = 'summary-placed-charm';
-        cImg.style.left = `${order.charm.left}px`;
-        cImg.style.top = `${order.charm.top}px`;
-        cImg.style.width = `${order.charm.width}px`;
-        cImg.style.height = `${order.charm.height}px`;
-        if (order.charm.rotate) {
-          cImg.style.transform = `rotate(${order.charm.rotate}deg)`;
-        }
-
-        const loopEl = document.createElement('div');
-        loopEl.className = 'summary-charm-loop';
-        loopEl.style.top = `${order.charm.loopTop || 118}px`;
-
-        summaryCharmLayer.appendChild(cImg);
-        summaryCharmLayer.appendChild(loopEl);
       }
     }
 
@@ -427,7 +414,7 @@
 
       const priceSpan = document.createElement('span');
       priceSpan.className = 'receipt-item-price';
-      priceSpan.textContent = `₹${priceNum.toFixed(2)}`;
+      priceSpan.textContent = `₹${Math.round(priceNum)}`;
 
       row.appendChild(nameSpan);
       row.appendChild(leaderSpan);
@@ -444,22 +431,18 @@
 
       if (Array.isArray(order.stickers)) {
         order.stickers.forEach((sticker) => {
-          const p = Number(sticker.price) || 0;
+          const p = (sticker.id && STICKER_PRICE_MAP[sticker.id]) ||
+                    (sticker.name && STICKER_PRICE_BY_NAME[sticker.name]) ||
+                    (Number(sticker.price) >= 80 && Number(sticker.price) <= 150 ? Number(sticker.price) : 119.00);
           itemsSubtotal += p;
           summaryReceiptLines.appendChild(createReceiptRow(sticker.name, p));
         });
       }
 
       if (order.includeCase !== false) {
-        const casePrice = Number(order.casePrice) || 2499.00;
+        const casePrice = 500.00;
         itemsSubtotal += casePrice;
         summaryReceiptLines.appendChild(createReceiptRow(order.caseLabel || 'IPhone 16: P_Cover2', casePrice));
-      }
-
-      if (order.charm) {
-        const charmPrice = Number(order.charm.price) || 649.00;
-        itemsSubtotal += charmPrice;
-        summaryReceiptLines.appendChild(createReceiptRow(order.charm.name || 'STAR_Charm', charmPrice));
       }
     }
 
@@ -517,15 +500,15 @@
       if (ready) {
         currentDelivery = { charge, label: `Delivery Charges (${zoneText})`, ready: true };
         deliveryLabel.textContent = currentDelivery.label;
-        deliveryPriceEl.textContent = `₹${charge.toFixed(2)}`;
+        deliveryPriceEl.textContent = `₹${Math.round(charge)}`;
+        const grandTotal = itemsSubtotal + currentDelivery.charge;
+        totalPriceEl.textContent = `₹${Math.round(grandTotal)}`;
       } else {
         currentDelivery = { charge: 0, label: 'Enter address to calculate', ready: false };
         deliveryLabel.textContent = 'Delivery Charges (enter address)';
         deliveryPriceEl.textContent = '--';
+        totalPriceEl.textContent = '--';
       }
-
-      const grandTotal = itemsSubtotal + currentDelivery.charge;
-      totalPriceEl.textContent = `₹${grandTotal.toFixed(2)}`;
     }
 
     [cityInput, stateInput, zipInput, countryInput].forEach((inputEl) => {
@@ -592,7 +575,7 @@
         }).catch(() => {});
       }
 
-      submitOrderBtn.textContent = `ORDER SUBMITTED ✓  TOTAL ₹${record.total.toFixed(2)}`;
+      submitOrderBtn.textContent = `ORDER SUBMITTED ✓  TOTAL ₹${Math.round(record.total)}`;
       submitOrderBtn.classList.add('submitted');
       setTimeout(() => {
         submitOrderBtn.textContent = 'SUBMIT ORDER';

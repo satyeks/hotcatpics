@@ -398,6 +398,17 @@ body {
   top: 48px;
 }
 
+/* Yeezy-style asset protection: right clicking anywhere shows page context menu instead of "Open image in new tab" */
+img,
+.summary-case-img,
+.summary-placed-sticker {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
 .summary-case-img {
   position: absolute;
   top: 0;
@@ -421,31 +432,6 @@ body {
   position: absolute;
   display: block;
   object-fit: fill;
-}
-
-.summary-charm-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 374px;
-  height: 450px;
-  z-index: 15;
-  overflow: visible;
-}
-
-.summary-placed-charm {
-  position: absolute;
-  display: block;
-  object-fit: fill;
-}
-
-.summary-charm-loop {
-  position: absolute;
-  left: 275px;
-  width: 6px;
-  height: 19px;
-  background: rgba(255, 255, 255, 0.78);
-  border-radius: 191px;
 }
 
 /* Order Summary Receipt */
@@ -508,10 +494,11 @@ body {
 /* instagram - @hotcatpic */
 .site-footer {
   position: absolute;
-  width: 192px;
+  width: 460px;
   height: 18px;
-  left: 639px;
+  left: 505px;
   bottom: 17px;
+  text-align: center;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 600;
@@ -528,4 +515,8 @@ body {
 
 .site-footer a:hover {
   text-decoration: underline;
+}
+
+.site-footer .footer-sep {
+  margin: 0 14px;
 }

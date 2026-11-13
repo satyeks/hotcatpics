@@ -33,8 +33,9 @@ body {
 /* 29 - Main Inventory Canvas */
 .inventory-page {
   position: relative;
+  display: flow-root;
   width: 1470px;
-  height: 1694px;
+  height: var(--page-h, 1280px);
   margin: 0 auto;
   background: #FFFFFF;
 }
@@ -62,11 +63,16 @@ body {
   height: 18px;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
+  font-weight: 400;
   font-size: 15px;
   line-height: 18px;
   color: #000000;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.nav-item:hover {
+  font-weight: 600;
 }
 
 /* PRESETS */
@@ -82,6 +88,10 @@ body {
   width: 79px;
   left: 352px;
   top: 35px;
+  font-weight: 400;
+}
+
+.nav-inventory.active {
   font-weight: 600;
 }
 
@@ -107,15 +117,8 @@ body {
 /* WISHLIST */
 .nav-wishlist {
   width: auto;
-  left: 1272px;
-  top: 35px;
-  font-weight: 400;
-}
-
-/* CART 0 */
-.nav-cart {
-  width: 53px;
-  left: 1386px;
+  right: 31px;
+  left: auto;
   top: 35px;
   font-weight: 400;
 }
@@ -158,16 +161,10 @@ body {
   top: 130px;
 }
 
-/* Right Filter Icon (Group 8 at left: 843px, top: 127px) */
-.close-right {
-  left: 843px;
-  top: 130px;
-}
-
 /* Preview Filter Icon (Group 7 at left: 838px, top: 752px) */
 .close-preview-filter {
-  left: 838px;
-  top: 755px;
+  left: 0;
+  top: 593px;
 }
 
 /* Sub-Nav Filter Links */
@@ -182,6 +179,10 @@ body {
   white-space: nowrap;
 }
 
+.filter-item:hover {
+  font-weight: 600;
+}
+
 /* STICKERS */
 .filter-stickers {
   width: 70px;
@@ -192,58 +193,82 @@ body {
   transition: opacity 0.2s ease;
 }
 
-/* CHARMS */
-.filter-charms {
-  width: 53px;
-  left: 147.21px;
-  top: 129px;
-  font-weight: 400;
-  color: #000000;
-  transition: opacity 0.2s ease;
-}
-
-.filter-stickers.active,
-.filter-charms.active {
+.filter-stickers.active {
   font-weight: 600;
 }
 
-/* BOTTLE */
-.filter-bottle {
-  width: 53px;
-  left: 877px;
-  top: 128px;
-  font-weight: 400;
-  color: #131313;
+/* ==========================================================
+   Group 23: Main Content Area & Sticky Right Preview Section
+   ========================================================== */
+.inventory-content {
+  position: relative;
+  width: 1470px;
+  height: var(--pane-h, 1060px);
+  margin-top: 162px;
 }
 
-/* CASES */
-.filter-cases {
-  width: 44px;
-  left: 957px;
-  top: 128px;
-  font-weight: 600;
-  color: #131313;
+/* Right Preview & Controls Container - Sticky on Desktop so preview remains visible while stickers scroll */
+.preview-section {
+  position: absolute;
+  left: 838px;
+  top: 0;
+  width: 620px;
+  height: var(--pane-h, 1040px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  z-index: 50;
 }
 
-/* LAPTOP */
-.filter-laptop {
-  width: 53px;
-  left: 1024px;
-  top: 128px;
-  font-weight: 400;
-  color: #131313;
+.preview-section::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
-/* T-SHIRTS */
-.filter-tshirts {
-  width: 71px;
-  left: 1107px;
-  top: 128px;
-  font-weight: 400;
-  color: #131313;
+/* Desktop: the page itself never scrolls - stickers and preview each scroll on their own */
+@media (min-width: 821px) {
+  html:has(.inventory-page),
+  html:has(.inventory-page) body {
+    overflow: hidden !important;
+    height: 100%;
+  }
 }
 
 /* Left 2x3 Grid of Inventory Boxes */
+.inventory-grid {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 720px;
+  height: var(--pane-h, 1040px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.inventory-grid::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.inventory-grid::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 1250px;
+  width: 1px;
+  height: 60px;
+}
+
 .inventory-box {
   position: absolute;
   width: 329px;
@@ -261,45 +286,48 @@ body {
 /* Screenshot 2026-11-03 at 11.07.08 PM 5 */
 .box-1 {
   left: 22px;
-  top: 162px;
+  top: 0;
 }
 
 /* Screenshot 2026-11-03 at 11.07.08 PM 4 */
 .box-2 {
   left: 375px;
-  top: 162px;
+  top: 0;
 }
 
 /* Screenshot 2026-11-03 at 11.07.08 PM 7 */
 .box-3 {
   left: 22px;
-  top: 581px;
+  top: 419px;
 }
 
 /* Screenshot 2026-11-03 at 11.07.08 PM 6 */
 .box-4 {
   left: 375px;
-  top: 581px;
+  top: 419px;
 }
 
 /* Screenshot 2026-11-03 at 11.07.08 PM 9 */
 .box-5 {
   left: 22px;
-  top: 1000px;
+  top: 838px;
 }
 
 /* Screenshot 2026-11-03 at 11.07.08 PM 8 */
 .box-6 {
   left: 375px;
-  top: 1000px;
+  top: 838px;
 }
 
-/* Inventory Item Images (Stickers & Charms) */
+/* Inventory Item Images (Stickers) */
 .item-img {
   position: absolute;
   object-fit: contain;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   -webkit-user-drag: none;
+  pointer-events: none;
   transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -347,69 +375,13 @@ body {
   top: 70px;
 }
 
-/* Charm Positions inside Boxes 1-4 */
-.charm-img {
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.charm-1 {
-  width: 180px;
-  height: 276px;
-}
-
-.charm-2 {
-  width: 200px;
-  height: 261px;
-}
-
-.charm-3 {
-  width: 200px;
-  height: 263px;
-}
-
-.charm-4 {
-  width: 200px;
-  height: 238px;
-}
-
-/* Toggle visibility between STICKERS and CHARMS */
-.inventory-grid[data-active-category="stickers"] .sticker-img {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.inventory-grid[data-active-category="stickers"] .charm-img {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.inventory-grid[data-active-category="charms"] .sticker-img {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.inventory-grid[data-active-category="charms"] .charm-img {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.inventory-grid[data-active-category="charms"] .box-5,
-.inventory-grid[data-active-category="charms"] .box-6 {
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Frame 8 - Right Preview Box */
 .preview-frame {
-  position: absolute;
+  position: relative;
   width: 595px;
   height: 578px;
-  left: 838px;
-  top: 162px;
+  left: 0;
+  top: 0;
   background: #5DC6E8;
   overflow: hidden;
   transition: background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
@@ -482,44 +454,18 @@ body {
 .placed-sticker {
   position: absolute;
   display: block;
-  object-fit: fill;
-  cursor: grab;
+  object-fit: contain;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   -webkit-user-drag: none;
-}
-
-.placed-sticker:active {
-  cursor: grabbing;
-}
-
-/* Charm Layer: Hangs on top at the right side of the phone case */
-.case-charm-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 374px;
-  height: 450px;
-  z-index: 15;
-  overflow: visible;
   pointer-events: none;
 }
 
-.placed-charm {
-  position: absolute;
-  display: block;
-  object-fit: fill;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* Rectangle 58/59/60: White attachment loop on right bezel */
-.case-charm-loop {
-  position: absolute;
-  left: 275px;
-  width: 6px;
-  height: 19px;
-  background: rgba(255, 255, 255, 0.78);
-  border-radius: 191px;
+/* Preview Filter Icon */
+.close-preview-filter {
+  left: 0;
+  top: 593px;
 }
 
 /* FILTER */
@@ -527,8 +473,8 @@ body {
   position: absolute;
   width: 73px;
   height: 20px;
-  left: 857px;
-  top: 753px;
+  left: 19px;
+  top: 591px;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 400;
@@ -543,8 +489,8 @@ body {
   position: absolute;
   width: 60px;
   height: 20px;
-  left: 952px;
-  top: 753px;
+  left: 114px;
+  top: 591px;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 400;
@@ -557,8 +503,8 @@ body {
 .device-list {
   position: absolute;
   width: 198px;
-  left: 1041px;
-  top: 753px;
+  left: 203px;
+  top: 591px;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 400;
@@ -575,7 +521,8 @@ body {
 }
 
 .device-item:hover {
-  opacity: 0.7;
+  font-weight: 600;
+  opacity: 1;
 }
 
 /* Smooth accordion expansion when a phone brand is clicked */
@@ -621,8 +568,8 @@ body {
   position: absolute;
   width: 158px;
   height: 20px;
-  left: 1268px;
-  top: 753px;
+  left: 430px;
+  top: 591px;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 400;
@@ -637,7 +584,7 @@ body {
   position: absolute;
   width: 15px;
   height: 15px;
-  top: 779px;
+  top: 617px;
   border: 1px solid transparent;
   border-radius: 200px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
@@ -655,30 +602,35 @@ body {
 
 /* Rectangle 71 */
 .swatch-blue {
-  left: 1268px;
+  left: 430px;
   background: #5DC6E8;
 }
 
 /* Rectangle 72 */
 .swatch-white {
-  left: 1301px;
+  left: 463px;
   background: #FFFFFF;
 }
 
 /* Rectangle 73 */
 .swatch-pink {
-  left: 1334px;
+  left: 496px;
   background: #FF9393;
 }
 
 /* Rectangle 74 */
 .swatch-yellow {
-  left: 1367px;
+  left: 529px;
   background: #FFE079;
 }
 
 /* Model Color Section - Smooth fade & slide until a phone/model is selected */
 .model-color-section {
+  position: absolute;
+  left: 0;
+  top: 777px;
+  width: 595px;
+  height: 24px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -701,8 +653,8 @@ body {
   position: absolute;
   width: 50px;
   height: 20px;
-  left: 950px;
-  top: 939px;
+  left: 112px;
+  top: 0;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 400;
@@ -716,7 +668,7 @@ body {
   position: absolute;
   width: 12px;
   height: 12px;
-  top: 943px;
+  top: 4px;
   border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
@@ -732,33 +684,33 @@ body {
 
 /* Rectangle 52 */
 .color-red {
-  left: 1013px;
+  left: 175px;
   background: #BE0000;
 }
 
 /* Rectangle 53 */
 .color-blue {
-  left: 1046px;
+  left: 208px;
   background: #61C7E7;
 }
 
 /* Rectangle 54 */
 .color-white {
-  left: 1079px;
+  left: 241px;
   background: #FFFFFF;
 }
 
 /* Rectangle 55 */
 .color-black {
-  left: 1112px;
+  left: 274px;
   background: #000000;
 }
 
 /* Receipt / Description & Price Section */
 .receipt-section {
   position: absolute;
-  left: 838px;
-  top: 974px;
+  left: 0;
+  top: 812px;
   width: 595px;
   font-family: 'Sometype Mono', monospace;
   color: #131313;
@@ -863,7 +815,7 @@ body {
   transform: scale(0.99);
 }
 
-/* Minimal dustbin icon beside each sticker / charm name in the receipt */
+/* Minimal dustbin icon beside each sticker name in the receipt */
 .receipt-item-name { order: 0; }
 .receipt-remove-btn { order: 1; }
 .receipt-item-leader { order: 2; }
@@ -901,10 +853,11 @@ body {
 /* instagram - @hotcatpic */
 .site-footer {
   position: absolute;
-  width: 192px;
+  width: 460px;
   height: 18px;
-  left: 639px;
+  left: 505px;
   bottom: 17px;
+  text-align: center;
   font-family: 'Sometype Mono', monospace;
   font-style: normal;
   font-weight: 600;
@@ -921,4 +874,8 @@ body {
 
 .site-footer a:hover {
   text-decoration: underline;
+}
+
+.site-footer .footer-sep {
+  margin: 0 14px;
 }

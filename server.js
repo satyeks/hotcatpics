@@ -105,7 +105,6 @@ const server = http.createServer(async (req, res) => {
       caseColor: body.caseColor || 'white',
       bgColor: body.bgColor || '#5DC6E8',
       stickers: Array.isArray(body.stickers) ? body.stickers : [],
-      charm: body.charm || null,
       orders: Number(body.orders) || 0,
       createdAt: Date.now()
     };
