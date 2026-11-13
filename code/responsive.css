@@ -221,6 +221,26 @@ html, body {
   .block {
     zoom: var(--block-zoom, 0.5);
   }
+  .preset-price-tag {
+    font-size: 28px !important;
+    line-height: 32px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    opacity: 0.95 !important;
+    bottom: 18px !important;
+    left: 18px !important;
+    letter-spacing: -0.3px !important;
+  }
+  .preset-like-btn {
+    width: 44px !important;
+    height: 44px !important;
+    top: 10px !important;
+    right: 10px !important;
+  }
+  .preset-like-btn svg {
+    width: 30px !important;
+    height: 28px !important;
+  }
 
   .landing-page.split-view .filter-bar,
   .landing-page.liked-view .filter-bar,
