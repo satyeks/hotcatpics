@@ -32,6 +32,16 @@ html, body {
 }
 
 
+@media (min-width: 821px) {
+  .preview-filter-header,
+  .preview-controls-drawer {
+    display: contents !important;
+  }
+  .preview-filter-toggle-state {
+    display: none !important;
+  }
+}
+
 @media (min-width: 821px) and (max-width: 1469px) {
   .landing-page,
   .inventory-page,
@@ -229,136 +239,411 @@ html, body {
   }
 
   /* ================= INVENTORY (inventory.html) ================= */
-  .sub-nav,
-  .inventory-content,
-  .preview-section {
+  .inventory-content {
     display: contents;
   }
 
-  /* 1. Solid Preview Wall pinned at the top on mobile */
-  .preview-frame {
-    order: 1;
+  /* 1. Header is sticky at top: 0 */
+  .header {
     position: sticky;
     top: 0;
+    z-index: 1000;
+    height: auto;
+    margin-bottom: 0 !important;
+    padding: 12px 16px 8px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  /* 2. Pinned Top Preview & Filter Bar */
+  .preview-section {
+    order: 1;
+    position: sticky;
+    top: var(--header-h, 58px);
     left: auto;
-    z-index: 80;
+    z-index: 900;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: auto;
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .preview-frame {
+    position: relative;
+    left: auto;
+    top: auto;
     align-self: center;
-    width: calc(100% - 32px);
-    height: calc(500px * var(--pv-zoom, 0.6));
-    margin: 12px auto 0;
+    width: calc(100% - 32px) !important;
+    max-width: 380px !important;
+    height: 230px !important;
+    margin: 8px auto 4px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #5DC6E8;
     zoom: 1 !important;
-    box-shadow: 0 -24px 0 24px #FFFFFF, 0 10px 0 10px #FFFFFF;
+    box-shadow: none !important;
+    box-sizing: border-box;
   }
+
   .preview-label {
+    position: absolute;
+    right: 12px !important;
     left: auto !important;
-    right: 14px !important;
-    top: 12px !important;
+    top: 10px !important;
     width: auto !important;
+    font-size: 13px;
+    line-height: 16px;
+    color: #FFFFFF;
+    z-index: 5;
   }
+
   .preview-case-stack {
+    position: absolute;
+    width: 374px !important;
+    height: 450px !important;
     left: 50% !important;
     top: 50% !important;
-    transform: translate(-50%, -50%) scale(var(--pv-zoom, 0.6)) !important;
+    transform: translate(-50%, -50%) scale(0.46) !important;
     transform-origin: center center !important;
   }
 
-  /* 2. Sticker Scroll Section right below the Preview Wall */
-  .left-filter {
+  /* Filter & Device Header Bar */
+  .preview-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #ECECEC;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .preview-filter-header .close-preview-filter {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 15px !important;
+    height: 15px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .preview-section.filter-collapsed .preview-filter-header .close-preview-filter {
+    transform: rotate(45deg);
+  }
+
+  .preview-filter-header .label-filter,
+  .preview-filter-header .label-device {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 14px;
+    line-height: 18px;
+    color: #131313;
+    font-weight: 500;
+  }
+
+  .preview-filter-toggle-state {
+    display: inline-block;
+    margin-left: auto;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 11px;
+    line-height: 14px;
+    color: #888888;
+    letter-spacing: 0.5px;
+  }
+
+  /* Collapsible Controls Drawer */
+  .preview-controls-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px 14px;
+    background: #FFFFFF;
+    max-height: 48vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid #E5E5E5;
+    transition: max-height 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease, padding 0.25s ease;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .preview-section.filter-collapsed .preview-controls-drawer {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    border-bottom: none !important;
+    pointer-events: none !important;
+  }
+
+  /* 1. Phone Company & Models */
+  .preview-controls-drawer .device-list {
+    position: static !important;
+    width: 100% !important;
+    margin: 0;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #131313;
+  }
+
+  .preview-controls-drawer .device-brand {
+    margin-bottom: 6px;
+  }
+
+  .preview-controls-drawer .brand-title {
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+
+  .preview-controls-drawer .device-item.sub-device {
+    padding-left: 16px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    cursor: pointer;
+    font-weight: 400;
+  }
+
+  .preview-controls-drawer .device-item.sub-device.active {
+    font-weight: 700;
+  }
+
+  .preview-controls-drawer .device-spacer {
+    height: 8px;
+  }
+
+  /* 2. Model Color Row (under model) */
+  .preview-controls-drawer .model-color-section {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 4px 0;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .preview-controls-drawer .label-color {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 13px;
+    line-height: 16px;
+    color: #131313;
+    font-weight: 500;
+  }
+
+  .preview-controls-drawer .device-color-swatch {
+    position: static !important;
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .preview-controls-drawer .device-color-swatch.active {
+    border-color: #000000;
+  }
+
+  /* 3. Phone Model Background Color Row (outside model) */
+  .preview-controls-drawer .ctl-bg {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 4px 0;
+  }
+
+  .preview-controls-drawer .label-bg-color {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    font-family: 'Sometype Mono', monospace;
+    font-size: 13px;
+    line-height: 16px;
+    color: #131313;
+    font-weight: 500;
+  }
+
+  .preview-controls-drawer .bg-swatch {
+    position: static !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .preview-controls-drawer .bg-swatch.active {
+    border-color: #000000;
+  }
+
+  /* 4. Accumulating Price / Receipt Section */
+  .preview-controls-drawer .receipt-section {
+    position: static !important;
+    width: 100% !important;
+    margin: 4px 0 0;
+    padding: 0;
+    font-family: 'Sometype Mono', monospace;
+    color: #131313;
+    box-sizing: border-box;
+  }
+
+  .preview-controls-drawer .receipt-divider {
+    width: 100% !important;
+    height: 1px;
+    background: #E5E5E5;
+    margin: 0 0 10px;
+  }
+
+  .preview-controls-drawer .receipt-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888888;
+    margin-bottom: 6px;
+    width: 100% !important;
+  }
+
+  .preview-controls-drawer .receipt-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    width: 100% !important;
+  }
+
+  .preview-controls-drawer .receipt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100% !important;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .preview-controls-drawer .receipt-remove-btn {
+    position: static !important;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  .preview-controls-drawer .receipt-actions {
+    width: 100% !important;
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: flex-start;
+    box-sizing: border-box;
+  }
+
+  .preview-controls-drawer .share-preset-col {
+    flex: 1;
+    width: 50%;
+  }
+
+  .preview-controls-drawer .btn-proceed-buy {
+    flex: 1;
+    width: 50% !important;
+  }
+
+  .preview-controls-drawer .action-btn {
+    width: 100%;
+    height: 42px;
+    font-size: 13px;
+  }
+
+  .preview-controls-drawer .share-preset-note {
+    font-size: 10px;
+    line-height: 1.3;
+    margin-top: 4px;
+    color: #777777;
+  }
+
+  /* 3. Sub-Nav / Left Filter Category Row */
+  .sub-nav {
     order: 2;
+    display: block;
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 14px 16px 6px;
+    background: #FFFFFF;
+  }
+
+  .left-filter {
     position: static;
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 22px 16px 12px;
+    gap: 16px;
+    width: 100%;
+    height: auto;
   }
+
+  .filter-stickers,
+  .filter-charms {
+    position: static;
+    width: auto;
+    height: auto;
+    font-size: 14px;
+    line-height: 18px;
+    font-family: 'Sometype Mono', monospace;
+    cursor: pointer;
+  }
+
+  /* 4. Stickers Grid - Scrolls Naturally Below */
   .inventory-grid {
     order: 3;
     position: static;
-    height: auto;
-    overflow: visible;
     display: grid;
     grid-template-columns: repeat(2, max-content);
     justify-content: center;
     gap: 10px;
-    padding: 0 16px 8px;
+    padding: 8px 16px 40px;
+    margin: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
   }
+
   .inventory-box {
     position: relative;
     left: auto;
     top: auto;
     zoom: var(--box-zoom, 0.5);
   }
-
-  /* 3. Device, Background Color, Case Color & Receipt below Sticker Scroll */
-  .ctl-device {
-    order: 4;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px 14px;
-    padding: 20px 16px 0;
-  }
-  .close-preview-filter { margin-top: 3px; }
-  .label-filter,
-  .label-device,
-  .label-bg-color,
-  .label-color {
-    position: static;
-    left: auto;
-    top: auto;
-    width: auto;
-    height: auto;
-  }
-  .device-list {
-    position: static;
-    left: auto;
-    top: auto;
-    width: 100%;
-    margin-top: 4px;
-  }
-  .ctl-bg {
-    order: 5;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 16px 0;
-  }
-  .model-color-section {
-    order: 6;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 16px 0;
-  }
-  .bg-swatch,
-  .device-color-swatch {
-    position: static;
-    left: auto;
-    top: auto;
-    flex-shrink: 0;
-  }
-  .bg-swatch { width: 20px; height: 20px; }
-  .device-color-swatch { width: 18px; height: 18px; }
-
-  .receipt-section {
-    order: 7;
-    position: static;
-    left: auto;
-    top: auto;
-    width: 100%;
-    padding: 22px 16px 0 36px;
-  }
-  .receipt-divider,
-  .receipt-actions { width: 100%; }
-  .receipt-actions { gap: 12px; align-items: flex-start; }
-  .share-preset-col { width: calc(50% - 6px); }
-  .receipt-actions .action-btn { width: 100%; }
-  .btn-proceed-buy { width: calc(50% - 6px) !important; }
-  .receipt-remove-btn { left: -20px; }
-  .receipt-section { padding-left: 20px; }
-  .receipt-divider { margin-left: -20px; width: calc(100% + 20px); }
 
   /* ================= CHECKOUT (checkout.html) ================= */
   .checkout-right {

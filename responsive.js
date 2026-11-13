@@ -16,6 +16,10 @@
     root.setProperty('--detail-zoom', cap(side / 598));
     root.setProperty('--box-zoom', cap(((vw - 42) / 2) / 329));
     root.setProperty('--block-zoom', cap(((vw - 42) / 2) / 330));
+    var headerEl = document.querySelector('.header');
+    if (headerEl) {
+      root.setProperty('--header-h', Math.round(headerEl.offsetHeight) + 'px');
+    }
   }
   setVars();
   window.addEventListener('resize', setVars);
