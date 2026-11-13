@@ -37,7 +37,8 @@ html, body {
   .preview-controls-drawer {
     display: contents !important;
   }
-  .preview-filter-toggle-state {
+  .preview-filter-toggle-state,
+  .mobile-filter-label {
     display: none !important;
   }
 }
@@ -404,6 +405,11 @@ html, body {
 
   .preview-filter-header .label-filter,
   .preview-filter-header .label-device {
+    display: none !important;
+  }
+
+  .mobile-filter-label {
+    display: inline-block !important;
     position: static !important;
     width: auto !important;
     height: auto !important;
@@ -412,16 +418,11 @@ html, body {
     line-height: 18px;
     color: #131313;
     font-weight: 500;
+    user-select: none;
   }
 
   .preview-filter-toggle-state {
-    display: inline-block;
-    margin-left: auto;
-    font-family: 'Sometype Mono', monospace;
-    font-size: 11px;
-    line-height: 14px;
-    color: #888888;
-    letter-spacing: 0.5px;
+    display: none !important;
   }
 
   /* Collapsible Controls Drawer */

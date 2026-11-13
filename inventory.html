@@ -128,7 +128,7 @@
       opacity: 0.35 !important;
     }
   </style>
-  <link rel="stylesheet" href="responsive.css?v=15" />
+  <link rel="stylesheet" href="responsive.css?v=16" />
   <script src="responsive.js?v=5"></script>
 </head>
 <body>
@@ -220,7 +220,7 @@
       </div>
 
       <!-- Group 9: Right Preview & Controls -->
-      <div class="preview-section" id="previewSection">
+      <div class="preview-section filter-collapsed" id="previewSection">
         <!-- Frame 8: Preview Box -->
         <div class="preview-frame" id="previewFrame">
           <span class="preview-label">PREVIEW</span>
@@ -238,14 +238,14 @@
         </div>
 
         <!-- Filter & Device Header Toggle Row (Sticky on Mobile) -->
-        <div class="preview-filter-header" id="previewFilterToggle" role="button" tabindex="0" aria-expanded="true" aria-controls="previewControlsDrawer">
+        <div class="preview-filter-header" id="previewFilterToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="previewControlsDrawer">
           <button type="button" class="close-btn close-preview-filter" id="clearDeviceFilter" aria-label="Toggle device filter">
             <span class="close-line line-1"></span>
             <span class="close-line line-2"></span>
           </button>
           <span class="label-filter">FILTER</span>
           <span class="label-device">DEVICE</span>
-          <span class="preview-filter-toggle-state" id="filterToggleState">HIDE</span>
+          <span class="mobile-filter-label" id="mobileFilterLabel">Show More</span>
         </div>
 
         <!-- Collapsible Controls Drawer: Company -> Model -> Color -> BG Color -> Accumulating Price -->
@@ -938,15 +938,15 @@
 
     const previewSection = document.getElementById('previewSection');
     const previewFilterToggle = document.getElementById('previewFilterToggle');
-    const filterToggleState = document.getElementById('filterToggleState');
+    const mobileFilterLabel = document.getElementById('mobileFilterLabel');
 
     function toggleFilterDrawer(e) {
       if (e) e.stopPropagation();
       if (window.innerWidth <= 820) {
         if (previewSection) {
           const isCollapsed = previewSection.classList.toggle('filter-collapsed');
-          if (filterToggleState) {
-            filterToggleState.textContent = isCollapsed ? 'SHOW' : 'HIDE';
+          if (mobileFilterLabel) {
+            mobileFilterLabel.textContent = isCollapsed ? 'Show More' : 'Show Less';
           }
           if (previewFilterToggle) {
             previewFilterToggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
