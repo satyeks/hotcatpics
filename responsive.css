@@ -178,6 +178,9 @@ html, body {
     line-height: 18px !important;
     color: #545454 !important;
   }
+  .inventory-page .site-footer {
+    display: none !important;
+  }
 
   /* ================= LANDING (index.html) ================= */
   .filter-bar {
