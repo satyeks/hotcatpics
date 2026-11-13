@@ -81,19 +81,41 @@ html, body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 16px 0;
+    padding: 14px 16px 8px;
+    background: #FFFFFF;
   }
   .logo {
     position: static;
+    display: flex;
+    align-items: center;
     width: auto;
     height: auto;
     font-size: 20px;
-    line-height: 26px;
+    line-height: 1;
+    margin: 0;
   }
   .header-right {
     display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
     gap: 16px;
     order: 2;
+  }
+  .nav-wishlist,
+  .liked-counter {
+    position: relative !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
   }
   .main-nav {
     display: flex;
@@ -686,3 +708,5 @@ html, body {
     font-size: 16px; /* prevents iOS zoom-on-focus */
   }
 }
+
+
